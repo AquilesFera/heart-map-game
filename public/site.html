@@ -379,33 +379,48 @@ Eu fiz hm.</p>
 </section>
 
 <section id="aventura">
-  <div class="st rv"><div class="sl"></div><h2>Nossa Aventura</h2><p>uma história só nossa, decidida juntos 💫</p><div class="sl"></div></div>
+  <div class="st rv"><div class="sl"></div><h2>Jardim do Nosso Amor</h2><p>caminhem juntos e juntem todos os corações 💕</p><div class="sl"></div></div>
   <div class="vn-box rv">
-    <div class="vn-pick" id="vnPick">
+    <div class="vn-pick" id="g2Pick">
       <p>Quem está jogando agora?</p>
       <div class="vn-pick-btns">
-        <button class="vn-pick-btn" onclick="vnSetRole('aquiles')"><span class="vn-pi">🤴</span>Sou o Aquiles</button>
-        <button class="vn-pick-btn" onclick="vnSetRole('giovana')"><span class="vn-pi">👑</span>Sou a Giovana</button>
+        <button class="vn-pick-btn" onclick="g2SetRole('aquiles')"><span class="vn-pi">🤴</span>Sou o Aquiles</button>
+        <button class="vn-pick-btn" onclick="g2SetRole('giovana')"><span class="vn-pi">👑</span>Sou a Giovana</button>
       </div>
     </div>
-    <div class="vn-scene" id="vnScene">
-      <div class="vn-who" id="vnWhoAmI"></div>
-      <div class="vn-emoji" id="vnEmoji">🌅</div>
-      <p class="vn-narr" id="vnNarr"></p>
-      <p class="vn-q" id="vnQ"></p>
-      <div class="vn-opts" id="vnOpts"></div>
-      <p class="vn-status" id="vnStatus"></p>
+    <div class="g2-stage" id="g2Stage">
+      <div class="vn-who" id="g2WhoAmI"></div>
+      <div class="g2-canvas-wrap">
+        <canvas id="g2Canvas" width="880" height="495"></canvas>
+        <div class="g2-bubble" id="g2Bubble"></div>
+      </div>
+      <div class="g2-hud">
+        <span class="g2-hearts" id="g2Hearts">💗 0 / 0</span>
+        <span class="g2-tip">use as setinhas — encontrem-se 💕</span>
+      </div>
+      <div class="g2-pad" id="g2Pad" aria-label="Controles">
+        <span class="g2-pad-empty"></span>
+        <button data-dir="up" aria-label="Cima">▲</button>
+        <span class="g2-pad-empty"></span>
+        <button data-dir="left" aria-label="Esquerda">◀</button>
+        <span class="g2-pad-empty"></span>
+        <button data-dir="right" aria-label="Direita">▶</button>
+        <span class="g2-pad-empty"></span>
+        <button data-dir="down" aria-label="Baixo">▼</button>
+        <span class="g2-pad-empty"></span>
+      </div>
       <div class="vn-actions">
-        <button class="vn-mini" onclick="vnReset()">🔄 Recomeçar</button>
-        <button class="vn-mini" onclick="vnChangeRole()">↺ Trocar de personagem</button>
+        <button class="vn-mini" onclick="g2Reset()">🔄 Recomeçar jardim</button>
+        <button class="vn-mini" onclick="g2ChangeRole()">↺ Trocar de personagem</button>
       </div>
     </div>
-    <div class="vn-scene vn-final" id="vnFinal">
+    <div class="g2-final" id="g2Final">
       <div class="vn-emoji">🌹</div>
-      <h3 id="vnFinalTitle">Nosso final</h3>
-      <p class="vn-narr" id="vnFinalNarr"></p>
+      <h3>Vocês juntaram todos os corações 💕</h3>
+      <p id="g2FinalNarr"></p>
       <div class="vn-actions">
-        <button class="vn-mini" onclick="vnReset()">💕 Reviver nossa aventura</button>
+        <button class="vn-mini" onclick="g2Reset()">🌷 Plantar um jardim novo</button>
+        <button class="vn-mini" onclick="g2ChangeRole()">↺ Trocar de personagem</button>
       </div>
     </div>
   </div>
