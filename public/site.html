@@ -173,33 +173,40 @@ footer{background:var(--bk);text-align:center;padding:80px 20px 60px;border-top:
 
 /* === VISUAL NOVEL === */
 #aventura{background:radial-gradient(ellipse at top,#1a0a18 0%,#060306 70%);min-height:100vh}
-.vn-box{max-width:680px;margin:0 auto}
+.vn-box{max-width:880px;margin:0 auto}
 .vn-pick{text-align:center;padding:30px 0}
 .vn-pick p{color:var(--pink);font-style:italic;font-size:15px;margin-bottom:24px}
 .vn-pick-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .vn-pick-btn{background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-radius:16px;padding:24px 26px;color:var(--cr);font-family:Georgia,serif;font-size:16px;cursor:pointer;transition:.3s;min-width:160px}
 .vn-pick-btn:hover{background:rgba(212,175,55,.14);border-color:var(--gold);transform:translateY(-3px)}
 .vn-pick-btn .vn-pi{font-size:36px;display:block;margin-bottom:8px}
-.vn-scene{background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.2);border-radius:22px;padding:36px 30px;display:none}
-.vn-scene.on{display:block;animation:fU .8s ease}
-.vn-emoji{font-size:60px;text-align:center;margin-bottom:14px}
-.vn-narr{color:var(--cr);font-size:16px;line-height:1.85;font-style:italic;text-align:center;margin-bottom:22px;white-space:pre-line}
-.vn-q{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:16px}
-.vn-opts{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-@media(max-width:560px){.vn-opts{grid-template-columns:1fr}}
-.vn-opt{background:rgba(196,80,110,.08);border:1px solid rgba(196,80,110,.3);border-radius:13px;padding:16px;color:var(--cr);font-family:Georgia,serif;font-size:14px;cursor:pointer;transition:.3s;line-height:1.45}
-.vn-opt:hover{background:rgba(196,80,110,.18);border-color:var(--rose);transform:scale(1.02)}
-.vn-opt.picked{background:rgba(212,175,55,.18);border-color:var(--gold);color:var(--gold)}
-.vn-opt.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
-.vn-status{margin-top:18px;text-align:center;color:var(--pink);font-size:13px;font-style:italic;min-height:20px}
 .vn-who{text-align:center;color:var(--gold);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;opacity:.75}
 .vn-who b{color:var(--rose)}
 .vn-actions{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
 .vn-mini{background:transparent;border:1px solid rgba(212,175,55,.4);color:var(--gold);padding:9px 20px;border-radius:24px;font-family:Georgia,serif;font-size:11px;letter-spacing:2px;cursor:pointer;transition:.3s}
 .vn-mini:hover{background:rgba(212,175,55,.12)}
-.vn-final{text-align:center}
-.vn-final h3{font-size:26px;color:var(--gold);margin-bottom:14px;font-weight:300}
-.vn-final .vn-narr{font-size:17px}
+
+/* === JOGO 2D === */
+.g2-stage{position:relative;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.25);border-radius:22px;padding:14px;display:none}
+.g2-stage.on{display:block;animation:fU .8s ease}
+.g2-canvas-wrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.45) inset}
+#g2Canvas{display:block;width:100%;height:100%;background:#0d2914;touch-action:none}
+.g2-hud{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 4px 4px;color:var(--cr);font-size:13px}
+.g2-hud .g2-hearts{color:var(--rose);letter-spacing:2px;font-size:14px}
+.g2-hud .g2-tip{color:var(--pink);font-style:italic;font-size:12px}
+.g2-bubble{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:rgba(20,8,16,.92);border:1px solid rgba(212,175,55,.4);color:var(--cr);padding:8px 16px;border-radius:20px;font-style:italic;font-size:13px;pointer-events:none;opacity:0;transition:opacity .35s;max-width:90%;text-align:center}
+.g2-bubble.show{opacity:1}
+.g2-pad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:6px;justify-content:center;margin:14px auto 6px}
+.g2-pad button{background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.3);border-radius:14px;color:var(--gold);font-size:22px;cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent;user-select:none}
+.g2-pad button:active,.g2-pad button.held{background:rgba(212,175,55,.28);transform:scale(.94)}
+.g2-pad .g2-pad-empty{visibility:hidden}
+.g2-final{text-align:center;padding:30px 18px;display:none}
+.g2-final.on{display:block;animation:fU .8s ease}
+.g2-final h3{font-size:26px;color:var(--gold);margin:10px 0 14px;font-weight:300}
+.g2-final p{color:var(--cr);font-size:16px;line-height:1.85;font-style:italic;white-space:pre-line;margin-bottom:18px}
+.g2-final .vn-emoji{font-size:60px}
+.vn-emoji{font-size:60px;text-align:center;margin-bottom:14px}
+@media(max-width:560px){.g2-pad{grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px)}}
 
 /* === MEM ONLINE EXTRA === */
 .mem-pick{text-align:center;padding:20px 0 30px}
@@ -240,7 +247,7 @@ footer{background:var(--bk);text-align:center;padding:80px 20px 60px;border-top:
     <li><a href="#frases">✨ Para você</a></li>
     <li><a href="#musicas">🎵 Músicas</a></li>
     <li><a href="#quiz">🧠 Quiz</a></li>
-    <li><a href="#aventura">💫 Aventura</a></li>
+    <li><a href="#aventura">🌷 Jardim</a></li>
     <li><a href="#memoria">🃏 Memória</a></li>
   </ul>
 </nav>
@@ -372,33 +379,48 @@ Eu fiz hm.</p>
 </section>
 
 <section id="aventura">
-  <div class="st rv"><div class="sl"></div><h2>Nossa Aventura</h2><p>uma história só nossa, decidida juntos 💫</p><div class="sl"></div></div>
+  <div class="st rv"><div class="sl"></div><h2>Jardim do Nosso Amor</h2><p>caminhem juntos e juntem todos os corações 💕</p><div class="sl"></div></div>
   <div class="vn-box rv">
-    <div class="vn-pick" id="vnPick">
+    <div class="vn-pick" id="g2Pick">
       <p>Quem está jogando agora?</p>
       <div class="vn-pick-btns">
-        <button class="vn-pick-btn" onclick="vnSetRole('aquiles')"><span class="vn-pi">🤴</span>Sou o Aquiles</button>
-        <button class="vn-pick-btn" onclick="vnSetRole('giovana')"><span class="vn-pi">👑</span>Sou a Giovana</button>
+        <button class="vn-pick-btn" onclick="g2SetRole('aquiles')"><span class="vn-pi">🤴</span>Sou o Aquiles</button>
+        <button class="vn-pick-btn" onclick="g2SetRole('giovana')"><span class="vn-pi">👑</span>Sou a Giovana</button>
       </div>
     </div>
-    <div class="vn-scene" id="vnScene">
-      <div class="vn-who" id="vnWhoAmI"></div>
-      <div class="vn-emoji" id="vnEmoji">🌅</div>
-      <p class="vn-narr" id="vnNarr"></p>
-      <p class="vn-q" id="vnQ"></p>
-      <div class="vn-opts" id="vnOpts"></div>
-      <p class="vn-status" id="vnStatus"></p>
+    <div class="g2-stage" id="g2Stage">
+      <div class="vn-who" id="g2WhoAmI"></div>
+      <div class="g2-canvas-wrap">
+        <canvas id="g2Canvas" width="880" height="495"></canvas>
+        <div class="g2-bubble" id="g2Bubble"></div>
+      </div>
+      <div class="g2-hud">
+        <span class="g2-hearts" id="g2Hearts">💗 0 / 0</span>
+        <span class="g2-tip">use as setinhas — encontrem-se 💕</span>
+      </div>
+      <div class="g2-pad" id="g2Pad" aria-label="Controles">
+        <span class="g2-pad-empty"></span>
+        <button data-dir="up" aria-label="Cima">▲</button>
+        <span class="g2-pad-empty"></span>
+        <button data-dir="left" aria-label="Esquerda">◀</button>
+        <span class="g2-pad-empty"></span>
+        <button data-dir="right" aria-label="Direita">▶</button>
+        <span class="g2-pad-empty"></span>
+        <button data-dir="down" aria-label="Baixo">▼</button>
+        <span class="g2-pad-empty"></span>
+      </div>
       <div class="vn-actions">
-        <button class="vn-mini" onclick="vnReset()">🔄 Recomeçar</button>
-        <button class="vn-mini" onclick="vnChangeRole()">↺ Trocar de personagem</button>
+        <button class="vn-mini" onclick="g2Reset()">🔄 Recomeçar jardim</button>
+        <button class="vn-mini" onclick="g2ChangeRole()">↺ Trocar de personagem</button>
       </div>
     </div>
-    <div class="vn-scene vn-final" id="vnFinal">
+    <div class="g2-final" id="g2Final">
       <div class="vn-emoji">🌹</div>
-      <h3 id="vnFinalTitle">Nosso final</h3>
-      <p class="vn-narr" id="vnFinalNarr"></p>
+      <h3>Vocês juntaram todos os corações 💕</h3>
+      <p id="g2FinalNarr"></p>
       <div class="vn-actions">
-        <button class="vn-mini" onclick="vnReset()">💕 Reviver nossa aventura</button>
+        <button class="vn-mini" onclick="g2Reset()">🌷 Plantar um jardim novo</button>
+        <button class="vn-mini" onclick="g2ChangeRole()">↺ Trocar de personagem</button>
       </div>
     </div>
   </div>
@@ -740,146 +762,393 @@ async function initMemory(){
 // auto-restore role
 (function(){const r=localStorage.getItem('gl_role');if(r==='aquiles'||r==='giovana'){memSetRole(r);} })();
 
-// === VISUAL NOVEL ONLINE ===
-const VN_SCENES=[
-  {emoji:'🌅',narr:'Acordamos juntos. A luz da manhã passa pela janela e você sorri preguiçosamente, ainda enrolada no edredom.',q:'Como começamos esse dia?',
-    aquiles:[{k:'cafe',t:'Faço café na cama pra você ☕'},{k:'passeio',t:'Te chamo pra um passeio de manhã 🌿'}],
-    giovana:[{k:'abraco',t:'Te puxo pra mais cinco minutos de abraço 🤍'},{k:'risada',t:'Te dou um beijo e digo "bom dia, meu mundo" 💋'}]},
-  {emoji:'🗺️',narr:'O dia abriu lindo. A gente decide o que fazer juntos.',q:'Pra onde vamos hoje?',
-    aquiles:[{k:'praia',t:'Praia, vento no rosto 🌊'},{k:'cinema',t:'Cinema com pipoca 🎬'}],
-    giovana:[{k:'piquenique',t:'Piquenique no parque 🧺'},{k:'casa',t:'Ficar em casa só nós dois 🛋️'}]},
-  {emoji:'🎵',narr:'No meio do caminho, alguém liga uma música. Vira a trilha sonora desse momento nosso.',q:'Qual música toca agora?',
-    aquiles:[{k:'foi_assim',t:'"Foi Assim" — Sotam, Rob 💕'},{k:'every_breath',t:'"Every Breath You Take" 🤍'}],
-    giovana:[{k:'os_anjos',t:'"Os Anjos Cantam" 🌹'},{k:'friends',t:'"Friends" — Chase Atlantic 🖤'}]},
-  {emoji:'🎁',narr:'O Aquiles tirou algo do bolso e está com aquele sorriso safadinho. Tem surpresinha pra você.',q:'O que ele te entrega?',
-    aquiles:[{k:'flor',t:'Uma florzinha que peguei no caminho 🌸'},{k:'cartinha',t:'Uma cartinha escrita à mão 💌'}],
-    giovana:[{k:'aceito',t:'Aceito com beicinho e olhinho brilhando 🥺'},{k:'beijo',t:'Pulo no seu colo e te beijo 💋'}]},
-  {emoji:'🤍',narr:'A Giovana ficou quietinha de repente, encostada em você. Pediu uma coisinha…',q:'O que ela pede?',
-    aquiles:[{k:'aperto',t:'Te aperto bem forte sem soltar 🫂'},{k:'olha',t:'Te olho nos olhos sem dizer nada 👀'}],
-    giovana:[{k:'danca',t:'Quero uma dança lentinha com você 💃'},{k:'colinho',t:'Quero ficar no seu colinho 🫶'}]},
-  {emoji:'🌧️',narr:'De repente o tempo virou. Começou a chover forte e a luz piscou. A gente se olha e ri.',q:'Como a gente vira isso em algo nosso?',
-    aquiles:[{k:'velas',t:'Acendo velas e a casa fica nossa 🕯️'},{k:'chuva',t:'Te puxo pra dançar na chuva 💦'}],
-    giovana:[{k:'cobertor',t:'Faço uma cabaninha de cobertor 🛖'},{k:'foto',t:'Tiro mil fotos suas porque você fica linda assim 📸'}]},
-  {emoji:'🍝',narr:'Bateu uma fominha. A gente decide o jantar.',q:'O que vai ser?',
-    aquiles:[{k:'cozinhar',t:'Cozinhamos juntos, eu sujo a cozinha 👨\u200d🍳'},{k:'delivery',t:'Pede aquele delivery favorito 📱'}],
-    giovana:[{k:'sobremesa',t:'Mas tem que ter sobremesa! 🍰'},{k:'musica',t:'Ponho música baixinha e a gente come no sofá 🎶'}]},
-  {emoji:'🌙',narr:'A noite caiu. A gente tá só ali, juntinho, e o silêncio é gostoso. É hora de fechar esse dia.',q:'Como termina o nosso dia?',
-    aquiles:[{k:'estrela',t:'Vamos pra varanda olhar as estrelas ✨'},{k:'colo',t:'Deito no seu colo até dormir 😴'}],
-    giovana:[{k:'teamo',t:'Te abraço e digo "te amo bem maisss" 💕'},{k:'planos',t:'Faço planos de tudo que ainda quero viver com você ♾️'}]}
+// === JOGO 2D ONLINE — Jardim do Nosso Amor ===
+const G2_W=880, G2_H=495;
+// Cenário decorativo (desenhado na canvas): caminhos, árvore, banco, fogueira, flores
+const G2_DECOR={
+  path:[ // caminho zigue-zague
+    {x:80,y:430,w:720,h:30},
+    {x:380,y:200,w:180,h:30},
+    {x:380,y:200,w:30,h:260}
+  ],
+  tree:{x:150,y:140,r:55},
+  bench:{x:640,y:130,w:140,h:32},
+  pond:{x:240,y:300,rx:70,ry:38},
+  flowers:[ // x,y,emoji
+    [70,90,'🌷'],[820,80,'🌹'],[480,90,'🌸'],[60,260,'🌼'],
+    [820,260,'🌻'],[470,420,'🌷'],[180,420,'🌸'],[720,420,'🌹']
+  ]
+};
+// 8 corações espalhados em pontos fofos
+const G2_HEART_SPOTS=[
+  {x:200,y:160,msg:'a sombra da nossa árvore 🌳'},
+  {x:710,y:160,msg:'sentadinhos no banco 🪑'},
+  {x:240,y:300,msg:'reflexo da gente no laguinho 💧'},
+  {x:480,y:280,msg:'no meio do caminho, juntinhos 💞'},
+  {x:120,y:430,msg:'primeiro passo do jardim 🌿'},
+  {x:790,y:430,msg:'o cantinho mais escondido 🕯️'},
+  {x:480,y:90,msg:'lá no alto, perto das estrelas ✨'},
+  {x:480,y:430,msg:'bem no meio, onde tudo começa 💕'}
 ];
-function vnFinalMessage(history){
-  const aSet=history.map(h=>h.a).join('|');
-  const gSet=history.map(h=>h.g).join('|');
-  // Build a personalized narrative from the choices
-  const out=[];
-  out.push('No fim desse dia, depois de tudo,');
-  if(aSet.includes('cafe')||aSet.includes('passeio'))out.push('do nosso jeitinho preguiçoso de começar a manhã,');
-  if(gSet.includes('abraco')||gSet.includes('risada'))out.push('do beijo de bom-dia que virou rotina,');
-  if(aSet.includes('praia'))out.push('da brisa do mar nos cabelos da Giovana,');
-  if(aSet.includes('cinema'))out.push('da pipoca dividida no escurinho do cinema,');
-  if(gSet.includes('piquenique'))out.push('do piquenique no parque com sol gostoso,');
-  if(gSet.includes('casa'))out.push('do dia inteiro só nosso, em casa,');
-  if(aSet.includes('flor')||aSet.includes('cartinha'))out.push('da surpresinha pequena que te fez sorrir,');
-  if(gSet.includes('danca')||gSet.includes('colinho'))out.push('do colinho que virou abrigo,');
-  if(aSet.includes('velas')||gSet.includes('cobertor'))out.push('do nosso aconchego improvisado quando o mundo virou,');
-  if(aSet.includes('chuva'))out.push('da gente dançando na chuva como criança,');
-  if(aSet.includes('cozinhar')||aSet.includes('delivery'))out.push('do jantar bagunçado e perfeito,');
-  if(aSet.includes('estrela'))out.push('das estrelas que a gente assistiu de mãos dadas,');
-  out.push('eu olho pra você e percebo de novo:');
-  out.push('');
-  out.push('a vida fica leve do seu lado, Giovana 🌹');
-  out.push('e eu te escolheria em todas as histórias possíveis.');
-  out.push('');
-  out.push('— Aquiles 💕');
-  return out.join('\n');
+const G2_NEAR_MSGS=[
+  'te achei, meu amor 💕',
+  'fica pertinho de mim 🌹',
+  'meu lugar favorito é do seu lado ✨',
+  'eu te escolheria sempre 💞',
+  'meu coração fica bobo perto de você 🤍'
+];
+const G2_FINAL_NARR=
+`a gente caminhou esse jardim inteiro
+e juntou cada pedacinho de amor que tava espalhado por aí.
+no fim, o que sobrou foi a gente —
+e isso, Giovana, é tudo que eu sempre vou querer.
+
+— Aquiles 💕`;
+
+let g2Role=null, g2State=null, g2Subscribed=false;
+let g2LastSent=0, g2SendTimer=null;
+let g2Held={up:false,down:false,left:false,right:false};
+let g2Local={x:120,y:360,dir:'down',mov:false}; // posição local interpolada do meu personagem
+let g2Remote={x:760,y:360,dir:'down',mov:false}; // do outro
+let g2Anim=0, g2RAF=null, g2BubbleTimer=null;
+const G2_SPEED=140; // px/s
+const G2_CHAR_R=18;
+
+function g2El(id){return document.getElementById(id);}
+
+function g2SetRole(role){
+  g2Role=role; localStorage.setItem('gl_g2_role',role);
+  g2El('g2Pick').style.display='none';
+  g2El('g2Stage').classList.add('on');
+  g2El('g2WhoAmI').innerHTML=`Você é <b>${role==='aquiles'?'🤴 Aquiles':'👑 Giovana'}</b>`;
+  if(!sb){return;}
+  g2Load();
+  if(!g2Subscribed){
+    g2Subscribed=true;
+    sb.channel('g2').on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_session',filter:'id=eq.couple'},(p)=>g2Apply(p.new)).subscribe();
+  }
+  g2BindControls();
+  if(!g2RAF) g2Loop(performance.now());
 }
 
-let vnRole=null, vnState={scene_index:0,aquiles_choice:null,giovana_choice:null,history:[]};
-let vnBusy=false, vnSubscribed=false;
-function vnSetRole(role){
-  vnRole=role;localStorage.setItem('gl_vn_role',role);
-  document.getElementById('vnPick').style.display='none';
-  document.getElementById('vnScene').classList.add('on');
-  document.getElementById('vnWhoAmI').innerHTML=`Você é <b>${role==='aquiles'?'🤴 Aquiles':'👑 Giovana'}</b>`;
-  if(!sb){document.getElementById('vnStatus').textContent='Sem conexão 🌹';return;}
-  vnLoad();
-  if(!vnSubscribed){
-    vnSubscribed=true;
-    sb.channel('vn').on('postgres_changes',{event:'UPDATE',schema:'public',table:'vn_session',filter:'id=eq.couple'},(p)=>{vnApply(p.new);}).subscribe();
+function g2ChangeRole(){
+  g2Role=null; localStorage.removeItem('gl_g2_role');
+  g2El('g2Pick').style.display='block';
+  g2El('g2Stage').classList.remove('on');
+  g2El('g2Final').classList.remove('on');
+}
+
+async function g2Load(){
+  const {data}=await sb.from('game_session').select('*').eq('id','couple').single();
+  if(data){
+    if(!Array.isArray(data.hearts)||data.hearts.length===0){
+      // primeira vez — semeia os corações
+      await sb.from('game_session').update({hearts:G2_HEART_SPOTS,collected:[],updated_at:new Date().toISOString()}).eq('id','couple');
+    } else {
+      g2Apply(data);
+    }
   }
 }
-function vnChangeRole(){
-  vnRole=null;localStorage.removeItem('gl_vn_role');
-  document.getElementById('vnPick').style.display='block';
-  document.getElementById('vnScene').classList.remove('on');
-  document.getElementById('vnFinal').classList.remove('on');
-}
-async function vnLoad(){
-  const {data}=await sb.from('vn_session').select('*').eq('id','couple').single();
-  if(data)vnApply(data);
-}
-async function vnReset(){
+
+async function g2Reset(){
   if(!sb)return;
-  await sb.from('vn_session').update({scene_index:0,aquiles_choice:null,giovana_choice:null,history:[],updated_at:new Date().toISOString()}).eq('id','couple');
+  await sb.from('game_session').update({
+    ax:120,ay:360,adir:'down',amov:false,
+    gx:760,gy:360,gdir:'down',gmov:false,
+    hearts:G2_HEART_SPOTS,collected:[],messages:[],finished:false,
+    updated_at:new Date().toISOString()
+  }).eq('id','couple');
+  g2Local={x:g2Role==='aquiles'?120:760,y:360,dir:'down',mov:false};
 }
-function vnApply(s){
-  vnState=s;
-  const idx=s.scene_index|0;
-  const sceneEl=document.getElementById('vnScene');
-  const finalEl=document.getElementById('vnFinal');
-  if(idx>=VN_SCENES.length){
-    sceneEl.classList.remove('on');
-    finalEl.classList.add('on');
-    document.getElementById('vnFinalNarr').textContent=vnFinalMessage(Array.isArray(s.history)?s.history:[]);
+
+function g2Apply(s){
+  g2State=s;
+  // sincroniza posição do OUTRO jogador suavemente
+  if(g2Role==='aquiles'){
+    g2Remote.x=s.gx; g2Remote.y=s.gy; g2Remote.dir=s.gdir; g2Remote.mov=!!s.gmov;
+    // só puxa minha posição do banco se eu não estiver controlando (primeira carga)
+    if(g2Local._init!==true){g2Local.x=s.ax;g2Local.y=s.ay;g2Local.dir=s.adir;g2Local._init=true;}
+  } else {
+    g2Remote.x=s.ax; g2Remote.y=s.ay; g2Remote.dir=s.adir; g2Remote.mov=!!s.amov;
+    if(g2Local._init!==true){g2Local.x=s.gx;g2Local.y=s.gy;g2Local.dir=s.gdir;g2Local._init=true;}
+  }
+  // HUD corações
+  const hearts=Array.isArray(s.hearts)?s.hearts:[];
+  const collected=Array.isArray(s.collected)?s.collected:[];
+  g2El('g2Hearts').textContent=`💗 ${collected.length} / ${hearts.length}`;
+  // Mensagem nova?
+  const msgs=Array.isArray(s.messages)?s.messages:[];
+  if(msgs.length){
+    const last=msgs[msgs.length-1];
+    if(last && last.t && last.t!==g2Apply._lastShown){
+      g2Apply._lastShown=last.t;
+      g2ShowBubble(last.text);
+    }
+  }
+  // Final
+  if(s.finished){
+    g2El('g2Stage').classList.remove('on');
+    g2El('g2Final').classList.add('on');
+    g2El('g2FinalNarr').textContent=G2_FINAL_NARR;
+  } else {
+    g2El('g2Final').classList.remove('on');
+    g2El('g2Stage').classList.add('on');
+  }
+}
+
+function g2ShowBubble(text){
+  const b=g2El('g2Bubble'); if(!b)return;
+  b.textContent=text; b.classList.add('show');
+  clearTimeout(g2BubbleTimer);
+  g2BubbleTimer=setTimeout(()=>b.classList.remove('show'),2400);
+}
+
+function g2BindControls(){
+  if(g2BindControls._done)return; g2BindControls._done=true;
+  // Teclado
+  const keymap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
+  window.addEventListener('keydown',e=>{
+    if(!g2Role)return;
+    const d=keymap[e.key]; if(!d)return;
+    g2Held[d]=true;
+    // só prevenir scroll se a seção do jogo está visível
+    const stage=g2El('g2Stage'); if(stage && stage.classList.contains('on')){
+      const r=stage.getBoundingClientRect();
+      if(r.top<window.innerHeight && r.bottom>0) e.preventDefault();
+    }
+  });
+  window.addEventListener('keyup',e=>{
+    const d=keymap[e.key]; if(!d)return; g2Held[d]=false;
+  });
+  // Pad touch
+  g2El('g2Pad').querySelectorAll('button[data-dir]').forEach(btn=>{
+    const dir=btn.getAttribute('data-dir');
+    const press=(e)=>{e.preventDefault();g2Held[dir]=true;btn.classList.add('held');};
+    const release=(e)=>{e.preventDefault();g2Held[dir]=false;btn.classList.remove('held');};
+    btn.addEventListener('touchstart',press,{passive:false});
+    btn.addEventListener('touchend',release);
+    btn.addEventListener('touchcancel',release);
+    btn.addEventListener('mousedown',press);
+    btn.addEventListener('mouseup',release);
+    btn.addEventListener('mouseleave',release);
+  });
+}
+
+function g2Loop(now){
+  g2RAF=requestAnimationFrame(g2Loop);
+  const dt=Math.min(0.05,(now-(g2Loop._t||now))/1000); g2Loop._t=now;
+  g2Anim+=dt;
+  // movimento local
+  let dx=0,dy=0;
+  if(g2Held.up)dy-=1; if(g2Held.down)dy+=1;
+  if(g2Held.left)dx-=1; if(g2Held.right)dx+=1;
+  const moving=(dx||dy)?true:false;
+  if(moving){
+    const len=Math.hypot(dx,dy)||1;
+    g2Local.x+=(dx/len)*G2_SPEED*dt;
+    g2Local.y+=(dy/len)*G2_SPEED*dt;
+    // limites
+    g2Local.x=Math.max(G2_CHAR_R,Math.min(G2_W-G2_CHAR_R,g2Local.x));
+    g2Local.y=Math.max(G2_CHAR_R+10,Math.min(G2_H-G2_CHAR_R,g2Local.y));
+    // direção
+    if(Math.abs(dx)>Math.abs(dy)) g2Local.dir=dx>0?'right':'left';
+    else g2Local.dir=dy>0?'down':'up';
+  }
+  g2Local.mov=moving;
+  g2QueueSync();
+  g2CheckHearts();
+  g2Render();
+}
+
+function g2QueueSync(){
+  if(!sb||!g2Role||!g2State)return;
+  const now=performance.now();
+  if(now-g2LastSent<80){ // throttle ~12 Hz
+    if(!g2SendTimer){ g2SendTimer=setTimeout(()=>{g2SendTimer=null;g2QueueSync();},90); }
     return;
   }
-  finalEl.classList.remove('on');
-  sceneEl.classList.add('on');
-  const scene=VN_SCENES[idx];
-  document.getElementById('vnEmoji').textContent=scene.emoji;
-  document.getElementById('vnNarr').textContent=scene.narr;
-  document.getElementById('vnQ').textContent=`Cena ${idx+1} de ${VN_SCENES.length} — ${scene.q}`;
-  const opts=scene[vnRole]||[];
-  const myChoice=vnRole==='aquiles'?s.aquiles_choice:s.giovana_choice;
-  const otherChoice=vnRole==='aquiles'?s.giovana_choice:s.aquiles_choice;
-  const otherName=vnRole==='aquiles'?'👑 Giovana':'🤴 Aquiles';
-  const optsEl=document.getElementById('vnOpts');optsEl.innerHTML='';
-  opts.forEach(o=>{
-    const b=document.createElement('button');
-    b.className='vn-opt'+(myChoice===o.k?' picked':'')+(myChoice?' disabled':'');
-    b.textContent=o.t;
-    b.onclick=()=>vnChoose(o.k);
-    optsEl.appendChild(b);
-  });
-  const stat=document.getElementById('vnStatus');
-  if(myChoice && !otherChoice) stat.textContent=`Você escolheu ✓ — esperando ${otherName}…`;
-  else if(!myChoice && otherChoice) stat.textContent=`${otherName} já escolheu ✓ — sua vez 🌹`;
-  else if(!myChoice && !otherChoice) stat.textContent='Escolha sua opção 💫';
-  else stat.textContent='Os dois escolheram 💕 indo pra próxima cena…';
-  // If both chose, the scene will advance below (any client can do it)
-  if(s.aquiles_choice && s.giovana_choice && !vnBusy){
-    vnBusy=true;
-    setTimeout(()=>vnAdvance(),1100);
+  g2LastSent=now;
+  const patch=g2Role==='aquiles'
+    ? {ax:Math.round(g2Local.x),ay:Math.round(g2Local.y),adir:g2Local.dir,amov:g2Local.mov,updated_at:new Date().toISOString()}
+    : {gx:Math.round(g2Local.x),gy:Math.round(g2Local.y),gdir:g2Local.dir,gmov:g2Local.mov,updated_at:new Date().toISOString()};
+  sb.from('game_session').update(patch).eq('id','couple').then(()=>{},()=>{});
+}
+
+let g2HeartBusy=false, g2BumpBusy=false, g2LastBumpAt=0;
+async function g2CheckHearts(){
+  if(!g2State||g2State.finished)return;
+  const hearts=Array.isArray(g2State.hearts)?g2State.hearts:[];
+  const collected=Array.isArray(g2State.collected)?g2State.collected:[];
+  // posição do outro
+  const ox=g2Role==='aquiles'?g2Remote.x:g2Local.x;
+  const oy=g2Role==='aquiles'?g2Remote.y:g2Local.y;
+  const ax=g2Role==='aquiles'?g2Local.x:g2Remote.x;
+  const ay=g2Role==='aquiles'?g2Local.y:g2Remote.y;
+  // Coletar coração: precisa que OS DOIS estejam perto do mesmo coração 💕
+  if(!g2HeartBusy){
+    for(let i=0;i<hearts.length;i++){
+      if(collected.includes(i))continue;
+      const h=hearts[i];
+      const dA=Math.hypot(ax-h.x,ay-h.y);
+      const dG=Math.hypot(ox-h.x,oy-h.y);
+      if(dA<48 && dG<48){
+        g2HeartBusy=true;
+        const newCollected=[...collected,i];
+        const msgs=Array.isArray(g2State.messages)?[...g2State.messages]:[];
+        msgs.push({t:Date.now(),text:'💗 '+h.msg});
+        const finished=newCollected.length>=hearts.length;
+        await sb.from('game_session').update({collected:newCollected,messages:msgs.slice(-8),finished,updated_at:new Date().toISOString()}).eq('id','couple');
+        setTimeout(()=>{g2HeartBusy=false;},400);
+        break;
+      }
+    }
+  }
+  // Encontro: quando os dois se encostam, mostra mensagem fofa (1x a cada 6s)
+  const dPair=Math.hypot(ax-ox,ay-oy);
+  if(dPair<46 && !g2BumpBusy && Date.now()-g2LastBumpAt>6000){
+    g2BumpBusy=true; g2LastBumpAt=Date.now();
+    const t=G2_NEAR_MSGS[Math.floor(Math.random()*G2_NEAR_MSGS.length)];
+    const msgs=Array.isArray(g2State.messages)?[...g2State.messages]:[];
+    msgs.push({t:Date.now(),text:t});
+    await sb.from('game_session').update({messages:msgs.slice(-8),updated_at:new Date().toISOString()}).eq('id','couple');
+    setTimeout(()=>{g2BumpBusy=false;},500);
   }
 }
-async function vnChoose(k){
-  if(!sb||!vnRole)return;
-  const col=vnRole==='aquiles'?'aquiles_choice':'giovana_choice';
-  const cur=vnRole==='aquiles'?vnState.aquiles_choice:vnState.giovana_choice;
-  if(cur)return;
-  await sb.from('vn_session').update({[col]:k,updated_at:new Date().toISOString()}).eq('id','couple');
+
+function g2Render(){
+  const c=g2El('g2Canvas'); if(!c)return;
+  const ctx=c.getContext('2d');
+  // fundo gramado com gradiente
+  const g=ctx.createRadialGradient(G2_W/2,G2_H/2,80,G2_W/2,G2_H/2,600);
+  g.addColorStop(0,'#1d4a2a'); g.addColorStop(1,'#0a2412');
+  ctx.fillStyle=g; ctx.fillRect(0,0,G2_W,G2_H);
+  // textura pontinhos
+  ctx.fillStyle='rgba(255,255,255,0.025)';
+  for(let i=0;i<60;i++){
+    const px=(i*137.5)%G2_W, py=((i*89.7)%G2_H);
+    ctx.fillRect(px,py,2,2);
+  }
+  // caminhos de pedra
+  ctx.fillStyle='rgba(232,200,160,0.18)';
+  G2_DECOR.path.forEach(p=>{
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(p.x,p.y,p.w,p.h,12); else ctx.rect(p.x,p.y,p.w,p.h);
+    ctx.fill();
+  });
+  // laguinho
+  const p=G2_DECOR.pond;
+  const pg=ctx.createRadialGradient(p.x,p.y,4,p.x,p.y,p.rx);
+  pg.addColorStop(0,'rgba(120,180,220,0.8)'); pg.addColorStop(1,'rgba(40,70,100,0.6)');
+  ctx.fillStyle=pg;
+  ctx.beginPath(); ctx.ellipse(p.x,p.y,p.rx,p.ry,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(212,175,55,0.3)'; ctx.lineWidth=2; ctx.stroke();
+  // árvore
+  const t=G2_DECOR.tree;
+  ctx.fillStyle='#5a3820'; ctx.fillRect(t.x-8,t.y+t.r-10,16,32);
+  ctx.fillStyle='#1f6634';
+  ctx.beginPath(); ctx.arc(t.x-22,t.y,t.r-10,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(t.x+22,t.y-8,t.r-12,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(t.x,t.y-18,t.r-6,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#2a8a48';
+  ctx.beginPath(); ctx.arc(t.x-10,t.y+4,t.r-18,0,Math.PI*2); ctx.fill();
+  // banco
+  const b=G2_DECOR.bench;
+  ctx.fillStyle='#3a2818'; ctx.fillRect(b.x,b.y,b.w,8);
+  ctx.fillRect(b.x+10,b.y+8,8,18); ctx.fillRect(b.x+b.w-18,b.y+8,8,18);
+  ctx.fillStyle='rgba(58,40,24,0.6)'; ctx.fillRect(b.x,b.y-14,b.w,6);
+  // flores decorativas
+  ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  G2_DECOR.flowers.forEach(f=>{ctx.fillText(f[2],f[0],f[1]);});
+  // corações
+  if(g2State){
+    const hearts=Array.isArray(g2State.hearts)?g2State.hearts:[];
+    const collected=Array.isArray(g2State.collected)?g2State.collected:[];
+    hearts.forEach((h,i)=>{
+      if(collected.includes(i))return;
+      const bob=Math.sin(g2Anim*3+i)*3;
+      ctx.save();
+      ctx.shadowColor='#ff6b9d'; ctx.shadowBlur=18;
+      ctx.font='30px serif';
+      ctx.fillText('💗',h.x,h.y+bob);
+      ctx.restore();
+    });
+  }
+  // personagens
+  const aquilesPos=g2Role==='aquiles'?g2Local:g2Remote;
+  const giovanaPos=g2Role==='giovana'?g2Local:g2Remote;
+  g2DrawChar(ctx,aquilesPos,'aquiles');
+  g2DrawChar(ctx,giovanaPos,'giovana');
+  // labels
+  ctx.font='11px Georgia,serif'; ctx.fillStyle='rgba(212,175,55,0.85)';
+  ctx.fillText('Aquiles',aquilesPos.x,aquilesPos.y-32);
+  ctx.fillStyle='rgba(232,160,180,0.95)';
+  ctx.fillText('Giovana',giovanaPos.x,giovanaPos.y-32);
 }
-async function vnAdvance(){
-  // Only advance if the local state still shows both choices and we haven't already advanced
-  const {data:s}=await sb.from('vn_session').select('*').eq('id','couple').single();
-  if(!s||!s.aquiles_choice||!s.giovana_choice){vnBusy=false;return;}
-  const history=Array.isArray(s.history)?[...s.history]:[];
-  history.push({scene:s.scene_index,a:s.aquiles_choice,g:s.giovana_choice});
-  await sb.from('vn_session').update({scene_index:(s.scene_index|0)+1,aquiles_choice:null,giovana_choice:null,history,updated_at:new Date().toISOString()}).eq('id','couple');
-  vnBusy=false;
+
+function g2DrawChar(ctx,p,who){
+  const x=p.x, y=p.y;
+  // sombra
+  ctx.fillStyle='rgba(0,0,0,0.35)';
+  ctx.beginPath(); ctx.ellipse(x,y+18,16,5,0,0,Math.PI*2); ctx.fill();
+  // bobbing quando movendo
+  const bob=p.mov?Math.sin(g2Anim*10)*2:0;
+  const cy=y+bob;
+  // corpo (vestido/casaco)
+  if(who==='aquiles'){
+    ctx.fillStyle='#2a4a8c'; // azul escuro
+  } else {
+    ctx.fillStyle='#c4506e'; // rosa-vinho
+  }
+  ctx.beginPath(); ctx.moveTo(x-12,cy+18); ctx.lineTo(x+12,cy+18);
+  ctx.lineTo(x+10,cy-2); ctx.lineTo(x-10,cy-2); ctx.closePath(); ctx.fill();
+  // cabeça
+  ctx.fillStyle='#f3d4b3';
+  ctx.beginPath(); ctx.arc(x,cy-10,10,0,Math.PI*2); ctx.fill();
+  // cabelo
+  if(who==='aquiles'){
+    ctx.fillStyle='#3a2418';
+    ctx.beginPath(); ctx.arc(x,cy-13,10,Math.PI,0); ctx.fill();
+  } else {
+    ctx.fillStyle='#5a2818';
+    ctx.beginPath(); ctx.arc(x,cy-13,11,Math.PI,0); ctx.fill();
+    // mecha lateral
+    ctx.fillRect(x-11,cy-13,4,16);
+    ctx.fillRect(x+7,cy-13,4,16);
+  }
+  // coroa/coroinha
+  if(who==='aquiles'){
+    ctx.fillStyle='#d4af37';
+    ctx.fillRect(x-7,cy-22,14,3);
+    ctx.beginPath(); ctx.moveTo(x-7,cy-22); ctx.lineTo(x-5,cy-26); ctx.lineTo(x-3,cy-22); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x-1,cy-22); ctx.lineTo(x+1,cy-27); ctx.lineTo(x+3,cy-22); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x+3,cy-22); ctx.lineTo(x+5,cy-26); ctx.lineTo(x+7,cy-22); ctx.closePath(); ctx.fill();
+  } else {
+    ctx.fillStyle='#e8a0b4';
+    ctx.beginPath(); ctx.arc(x-7,cy-15,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#d4af37';
+    ctx.fillRect(x-5,cy-23,10,2);
+    ctx.beginPath(); ctx.arc(x,cy-25,2,0,Math.PI*2); ctx.fill();
+  }
+  // olhos (direção)
+  ctx.fillStyle='#1a0a08';
+  let ex=0,ey=0;
+  if(p.dir==='left')ex=-2; else if(p.dir==='right')ex=2;
+  if(p.dir==='up')ey=-1; else if(p.dir==='down')ey=1;
+  ctx.beginPath(); ctx.arc(x-3+ex,cy-10+ey,1.4,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+3+ex,cy-10+ey,1.4,0,Math.PI*2); ctx.fill();
+  // boquinha
+  ctx.strokeStyle='#a0454f'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(x,cy-6,2,0,Math.PI); ctx.stroke();
+  // braços (oscilam)
+  const sw=p.mov?Math.sin(g2Anim*10)*4:0;
+  ctx.strokeStyle=who==='aquiles'?'#2a4a8c':'#c4506e';
+  ctx.lineWidth=4; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(x-10,cy+2); ctx.lineTo(x-14,cy+10+sw); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+10,cy+2); ctx.lineTo(x+14,cy+10-sw); ctx.stroke();
 }
-// auto-restore vn role
-(function(){const r=localStorage.getItem('gl_vn_role');if(r==='aquiles'||r==='giovana'){vnSetRole(r);} })();
+
+// auto-restore role
+(function(){const r=localStorage.getItem('gl_g2_role');if(r==='aquiles'||r==='giovana'){g2SetRole(r);} })();
 
 // REVEAL
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:0.08});
