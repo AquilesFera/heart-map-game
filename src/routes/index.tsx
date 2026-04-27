@@ -1,26 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/")({
+  // Server-side redirect to the static site.html that contains the full
+  // single-file experience (login gate, visual novel, memory game, etc.)
+  beforeLoad: () => {
+    if (typeof window === "undefined") {
+      throw redirect({ href: "/site.html" });
+    }
+  },
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  // Client-side fallback (in case beforeLoad didn't redirect)
+  useEffect(() => {
+    window.location.replace("/site.html");
+  }, []);
+  return null;
 }
