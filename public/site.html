@@ -447,7 +447,46 @@ Eu fiz hm.</p>
   <span id="lb-n" onclick="lbn(1)">›</span>
 </div>
 
+<!-- Supabase JS via CDN for the online game state sync -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+// === SUPABASE CLIENT ===
+const SB_URL='https://shiixsstlefukslauwod.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoaWl4c3N0bGVmdWtzbGF1d29kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjQ3MDUsImV4cCI6MjA5Mjg0MDcwNX0.khmVJQwRiTGpfZouyrdkgnpgJymLGNjQ3y3JzK7gCdw';
+const sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+
+// === LOGIN GATE (senha "Florsinha") ===
+(function(){
+  const gate=document.getElementById('gate');
+  const card=document.getElementById('gateCard');
+  const inp=document.getElementById('gateInput');
+  const btn=document.getElementById('gateBtn');
+  const err=document.getElementById('gateErr');
+  const KEY='gl_unlocked_v1';
+  function unlock(){
+    gate.classList.add('gone');
+    setTimeout(()=>gate.remove(),900);
+    document.body.style.overflow='auto';
+  }
+  if(localStorage.getItem(KEY)==='1'){unlock();return;}
+  document.body.style.overflow='hidden';
+  setTimeout(()=>inp.focus(),300);
+  function tryEnter(){
+    const v=(inp.value||'').trim().toLowerCase();
+    if(v==='florsinha'){
+      localStorage.setItem(KEY,'1');
+      err.textContent='Bem-vinda meu amor 🌹';err.classList.add('show');err.style.color='#f0d870';
+      setTimeout(unlock,650);
+    }else{
+      card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake');
+      err.textContent='Hmm… não é essa, meu amor 🌹';err.classList.add('show');
+      inp.value='';inp.focus();
+    }
+  }
+  btn.addEventListener('click',tryEnter);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')tryEnter();});
+})();
+
 // PETALS
 const pw=document.getElementById('pw');
 const pe=['🌸','🌹','🌷','✨','💕','🌺'];
