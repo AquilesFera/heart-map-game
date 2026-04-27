@@ -29,14 +29,18 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Site Giovana" },
+      { name: "description", content: "A romantic visual novel and memory game for couples, featuring shared decision-making and turn-based play." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Site Giovana" },
+      { property: "og:description", content: "A romantic visual novel and memory game for couples, featuring shared decision-making and turn-based play." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Site Giovana" },
+      { name: "twitter:description", content: "A romantic visual novel and memory game for couples, featuring shared decision-making and turn-based play." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5ff90fb0-e206-4516-97b1-c42f6a34b2eb/id-preview-eeecfeb5--4a1fd70f-675e-492e-bda8-3e57d8d67404.lovable.app-1777298467754.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5ff90fb0-e206-4516-97b1-c42f6a34b2eb/id-preview-eeecfeb5--4a1fd70f-675e-492e-bda8-3e57d8d67404.lovable.app-1777298467754.png" },
     ],
     links: [
       {
