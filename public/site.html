@@ -624,7 +624,7 @@ function showResult(){
 }
 startQuiz();
 
-// MEMÓRIA
+// === MEMÓRIA ONLINE (Supabase Realtime, turn-based) ===
 const memCards=[
   {u:'fotos/mor-12.jpg',msg:'Ela 🌹 — A mulher mais linda do mundo inteiro'},
   {u:'fotos/amor-2.jpeg',msg:'Giovana ✨ — Seu sorriso é o que me faz te amar mais cada dia'},
@@ -635,37 +635,251 @@ const memCards=[
   {u:'fotos/nos-fofi.jpeg',msg:'Fofos 🥰 — Assim a gente fica para sempre'},
   {u:'fotos/nos-2.jpeg',msg:'Nosso jeitinho 🤍 — Te quero pra sempre assim, do meu lado'},
 ];
-let mFlipped=[],mMatched=0,mTries=0,mLocked=false;
-function initMemory(){
-  mFlipped=[];mMatched=0;mTries=0;mLocked=false;
-  document.getElementById('memWin').style.display='none';
-  document.getElementById('mPares').textContent='0/8';
-  document.getElementById('mTent').textContent='0';
-  const pairs=[...memCards,...memCards];
-  for(let i=pairs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pairs[i],pairs[j]]=[pairs[j],pairs[i]];}
-  const grid=document.getElementById('memGrid');grid.innerHTML='';
-  pairs.forEach((card)=>{
-    const el=document.createElement('div');el.className='mem-card';el.dataset.url=card.u;el.dataset.msg=card.msg;
-    el.innerHTML=`<div class="mem-front">🌹</div><div class="mem-back"><img src="${card.u}" loading="lazy"></div>`;
-    el.addEventListener('click',()=>flipCard(el));grid.appendChild(el);
-  });
+function memShuffle(seed){
+  // mulberry32 deterministic shuffle so both phones see the same board
+  let s=seed>>>0;
+  function rnd(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;}
+  const arr=[...memCards,...memCards].map((c,i)=>({...c,pid:i%memCards.length}));
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
 }
-function flipCard(el){
-  if(mLocked||el.classList.contains('flipped')||el.classList.contains('matched'))return;
-  el.classList.add('flipped');mFlipped.push(el);
-  if(mFlipped.length===2){
-    mLocked=true;mTries++;document.getElementById('mTent').textContent=mTries;
-    if(mFlipped[0].dataset.url===mFlipped[1].dataset.url){
-      mFlipped.forEach(c=>{c.classList.add('matched');c.querySelector('.mem-back').classList.add('matched-glow');});
-      showMemPop(mFlipped[0].dataset.msg);
-      mMatched++;document.getElementById('mPares').textContent=`${mMatched}/8`;
-      mFlipped=[];mLocked=false;
-      if(mMatched===8){setTimeout(()=>{document.getElementById('memWin').style.display='block';document.getElementById('memWinMsg').textContent=`Encontrou tudo em ${mTries} tentativas! Você me conhece de cor e salteado 💕`;},600);}
-    }else{setTimeout(()=>{mFlipped.forEach(c=>c.classList.remove('flipped'));mFlipped=[];mLocked=false;},1100);}
+let memRole=null, memBoard=[], memState={seed:1,flipped:[],matched:[],turn:'aquiles',score_a:0,score_g:0};
+let memBusy=false, memSubscribed=false;
+function memShowPop(msg){const p=document.getElementById('memPop');p.textContent=msg;p.classList.add('show');setTimeout(()=>p.classList.remove('show'),2800);}
+function memSetRole(role){
+  memRole=role;localStorage.setItem('gl_role',role);
+  document.getElementById('memPick').style.display='none';
+  document.getElementById('memPlay').style.display='block';
+  document.getElementById('memWhoAmI').innerHTML=`Você é <b>${role==='aquiles'?'🤴 Aquiles':'👑 Giovana'}</b>`;
+  if(!sb){memShowPop('Sem conexão com o servidor 🌹');return;}
+  memLoad();
+  if(!memSubscribed){
+    memSubscribed=true;
+    sb.channel('mem').on('postgres_changes',{event:'UPDATE',schema:'public',table:'mem_session',filter:'id=eq.couple'},(p)=>{memApply(p.new);}).subscribe();
   }
 }
-function showMemPop(msg){const p=document.getElementById('memPop');p.textContent=msg;p.classList.add('show');setTimeout(()=>p.classList.remove('show'),2800);}
-initMemory();
+async function memLoad(){
+  const {data}=await sb.from('mem_session').select('*').eq('id','couple').single();
+  if(data)memApply(data);
+}
+function memApply(s){
+  memState=s;memBoard=memShuffle(Number(s.seed));
+  document.getElementById('memScoreA').textContent=s.score_a;
+  document.getElementById('memScoreG').textContent=s.score_g;
+  const flipped=Array.isArray(s.flipped)?s.flipped:[];
+  const matched=Array.isArray(s.matched)?s.matched:[];
+  document.getElementById('mPares').textContent=`${matched.length/2}/8`;
+  const turnTxt=document.getElementById('memTurn');
+  if(matched.length===16){
+    const a=s.score_a,g=s.score_g;
+    let msg;
+    if(a>g)msg=`🤴 Aquiles venceu ${a}×${g} — mas no amor a gente sempre empata 💕`;
+    else if(g>a)msg=`👑 Giovana venceu ${g}×${a} — minha princesa campeã 🌹`;
+    else msg=`Empate ${a}×${g} — feitos um pro outro 💕`;
+    turnTxt.textContent='';
+    document.getElementById('memWin').style.display='block';
+    document.getElementById('memWinMsg').textContent=msg;
+  }else{
+    document.getElementById('memWin').style.display='none';
+    const isMine=s.turn===memRole;
+    turnTxt.textContent = isMine ? '✨ É a sua vez ✨' : `aguardando ${s.turn==='aquiles'?'🤴 Aquiles':'👑 Giovana'}…`;
+    turnTxt.classList.toggle('mine',isMine);
+  }
+  // render board
+  const grid=document.getElementById('memGrid');grid.innerHTML='';
+  memBoard.forEach((card,idx)=>{
+    const isMatched=matched.includes(idx);
+    const isFlipped=flipped.includes(idx)||isMatched;
+    const el=document.createElement('div');
+    el.className='mem-card'+(isFlipped?' flipped':'')+(isMatched?' matched':'');
+    if(s.turn!==memRole && !isFlipped) el.classList.add('locked-other');
+    el.innerHTML=`<div class="mem-front">🌹</div><div class="mem-back${isMatched?' matched-glow':''}"><img src="${card.u}" loading="lazy"></div>`;
+    el.addEventListener('click',()=>memFlip(idx));
+    grid.appendChild(el);
+  });
+  // if 2 cards flipped and not yet resolved: schedule resolve (only by current-turn player)
+  if(flipped.length===2 && s.turn===memRole && !memBusy){
+    memBusy=true;
+    setTimeout(()=>memResolve(),900);
+  }
+}
+async function memFlip(idx){
+  if(!sb||!memRole)return;
+  if(memState.turn!==memRole){memShowPop('Espera sua vez, meu amor 💕');return;}
+  const flipped=Array.isArray(memState.flipped)?[...memState.flipped]:[];
+  const matched=Array.isArray(memState.matched)?memState.matched:[];
+  if(flipped.length>=2)return;
+  if(flipped.includes(idx)||matched.includes(idx))return;
+  flipped.push(idx);
+  await sb.from('mem_session').update({flipped,updated_at:new Date().toISOString()}).eq('id','couple');
+}
+async function memResolve(){
+  const flipped=Array.isArray(memState.flipped)?memState.flipped:[];
+  if(flipped.length!==2){memBusy=false;return;}
+  const [a,b]=flipped;
+  const cardA=memBoard[a],cardB=memBoard[b];
+  const isMatch=cardA && cardB && cardA.pid===cardB.pid;
+  const newMatched=Array.isArray(memState.matched)?[...memState.matched]:[];
+  let newTurn=memState.turn;
+  let scoreA=memState.score_a,scoreG=memState.score_g;
+  if(isMatch){
+    newMatched.push(a,b);
+    if(memState.turn==='aquiles')scoreA++;else scoreG++;
+    memShowPop(cardA.msg);
+  }else{
+    newTurn=memState.turn==='aquiles'?'giovana':'aquiles';
+  }
+  await sb.from('mem_session').update({flipped:[],matched:newMatched,turn:newTurn,score_a:scoreA,score_g:scoreG,updated_at:new Date().toISOString()}).eq('id','couple');
+  memBusy=false;
+}
+async function initMemory(){
+  if(!sb)return;
+  const seed=Math.floor(Math.random()*1000000);
+  await sb.from('mem_session').update({seed,flipped:[],matched:[],turn:'aquiles',score_a:0,score_g:0,updated_at:new Date().toISOString()}).eq('id','couple');
+}
+// auto-restore role
+(function(){const r=localStorage.getItem('gl_role');if(r==='aquiles'||r==='giovana'){memSetRole(r);} })();
+
+// === VISUAL NOVEL ONLINE ===
+const VN_SCENES=[
+  {emoji:'🌅',narr:'Acordamos juntos. A luz da manhã passa pela janela e você sorri preguiçosamente, ainda enrolada no edredom.',q:'Como começamos esse dia?',
+    aquiles:[{k:'cafe',t:'Faço café na cama pra você ☕'},{k:'passeio',t:'Te chamo pra um passeio de manhã 🌿'}],
+    giovana:[{k:'abraco',t:'Te puxo pra mais cinco minutos de abraço 🤍'},{k:'risada',t:'Te dou um beijo e digo "bom dia, meu mundo" 💋'}]},
+  {emoji:'🗺️',narr:'O dia abriu lindo. A gente decide o que fazer juntos.',q:'Pra onde vamos hoje?',
+    aquiles:[{k:'praia',t:'Praia, vento no rosto 🌊'},{k:'cinema',t:'Cinema com pipoca 🎬'}],
+    giovana:[{k:'piquenique',t:'Piquenique no parque 🧺'},{k:'casa',t:'Ficar em casa só nós dois 🛋️'}]},
+  {emoji:'🎵',narr:'No meio do caminho, alguém liga uma música. Vira a trilha sonora desse momento nosso.',q:'Qual música toca agora?',
+    aquiles:[{k:'foi_assim',t:'"Foi Assim" — Sotam, Rob 💕'},{k:'every_breath',t:'"Every Breath You Take" 🤍'}],
+    giovana:[{k:'os_anjos',t:'"Os Anjos Cantam" 🌹'},{k:'friends',t:'"Friends" — Chase Atlantic 🖤'}]},
+  {emoji:'🎁',narr:'O Aquiles tirou algo do bolso e está com aquele sorriso safadinho. Tem surpresinha pra você.',q:'O que ele te entrega?',
+    aquiles:[{k:'flor',t:'Uma florzinha que peguei no caminho 🌸'},{k:'cartinha',t:'Uma cartinha escrita à mão 💌'}],
+    giovana:[{k:'aceito',t:'Aceito com beicinho e olhinho brilhando 🥺'},{k:'beijo',t:'Pulo no seu colo e te beijo 💋'}]},
+  {emoji:'🤍',narr:'A Giovana ficou quietinha de repente, encostada em você. Pediu uma coisinha…',q:'O que ela pede?',
+    aquiles:[{k:'aperto',t:'Te aperto bem forte sem soltar 🫂'},{k:'olha',t:'Te olho nos olhos sem dizer nada 👀'}],
+    giovana:[{k:'danca',t:'Quero uma dança lentinha com você 💃'},{k:'colinho',t:'Quero ficar no seu colinho 🫶'}]},
+  {emoji:'🌧️',narr:'De repente o tempo virou. Começou a chover forte e a luz piscou. A gente se olha e ri.',q:'Como a gente vira isso em algo nosso?',
+    aquiles:[{k:'velas',t:'Acendo velas e a casa fica nossa 🕯️'},{k:'chuva',t:'Te puxo pra dançar na chuva 💦'}],
+    giovana:[{k:'cobertor',t:'Faço uma cabaninha de cobertor 🛖'},{k:'foto',t:'Tiro mil fotos suas porque você fica linda assim 📸'}]},
+  {emoji:'🍝',narr:'Bateu uma fominha. A gente decide o jantar.',q:'O que vai ser?',
+    aquiles:[{k:'cozinhar',t:'Cozinhamos juntos, eu sujo a cozinha 👨\u200d🍳'},{k:'delivery',t:'Pede aquele delivery favorito 📱'}],
+    giovana:[{k:'sobremesa',t:'Mas tem que ter sobremesa! 🍰'},{k:'musica',t:'Ponho música baixinha e a gente come no sofá 🎶'}]},
+  {emoji:'🌙',narr:'A noite caiu. A gente tá só ali, juntinho, e o silêncio é gostoso. É hora de fechar esse dia.',q:'Como termina o nosso dia?',
+    aquiles:[{k:'estrela',t:'Vamos pra varanda olhar as estrelas ✨'},{k:'colo',t:'Deito no seu colo até dormir 😴'}],
+    giovana:[{k:'teamo',t:'Te abraço e digo "te amo bem maisss" 💕'},{k:'planos',t:'Faço planos de tudo que ainda quero viver com você ♾️'}]}
+];
+function vnFinalMessage(history){
+  const aSet=history.map(h=>h.a).join('|');
+  const gSet=history.map(h=>h.g).join('|');
+  // Build a personalized narrative from the choices
+  const out=[];
+  out.push('No fim desse dia, depois de tudo,');
+  if(aSet.includes('cafe')||aSet.includes('passeio'))out.push('do nosso jeitinho preguiçoso de começar a manhã,');
+  if(gSet.includes('abraco')||gSet.includes('risada'))out.push('do beijo de bom-dia que virou rotina,');
+  if(aSet.includes('praia'))out.push('da brisa do mar nos cabelos da Giovana,');
+  if(aSet.includes('cinema'))out.push('da pipoca dividida no escurinho do cinema,');
+  if(gSet.includes('piquenique'))out.push('do piquenique no parque com sol gostoso,');
+  if(gSet.includes('casa'))out.push('do dia inteiro só nosso, em casa,');
+  if(aSet.includes('flor')||aSet.includes('cartinha'))out.push('da surpresinha pequena que te fez sorrir,');
+  if(gSet.includes('danca')||gSet.includes('colinho'))out.push('do colinho que virou abrigo,');
+  if(aSet.includes('velas')||gSet.includes('cobertor'))out.push('do nosso aconchego improvisado quando o mundo virou,');
+  if(aSet.includes('chuva'))out.push('da gente dançando na chuva como criança,');
+  if(aSet.includes('cozinhar')||aSet.includes('delivery'))out.push('do jantar bagunçado e perfeito,');
+  if(aSet.includes('estrela'))out.push('das estrelas que a gente assistiu de mãos dadas,');
+  out.push('eu olho pra você e percebo de novo:');
+  out.push('');
+  out.push('a vida fica leve do seu lado, Giovana 🌹');
+  out.push('e eu te escolheria em todas as histórias possíveis.');
+  out.push('');
+  out.push('— Aquiles 💕');
+  return out.join('\n');
+}
+
+let vnRole=null, vnState={scene_index:0,aquiles_choice:null,giovana_choice:null,history:[]};
+let vnBusy=false, vnSubscribed=false;
+function vnSetRole(role){
+  vnRole=role;localStorage.setItem('gl_vn_role',role);
+  document.getElementById('vnPick').style.display='none';
+  document.getElementById('vnScene').classList.add('on');
+  document.getElementById('vnWhoAmI').innerHTML=`Você é <b>${role==='aquiles'?'🤴 Aquiles':'👑 Giovana'}</b>`;
+  if(!sb){document.getElementById('vnStatus').textContent='Sem conexão 🌹';return;}
+  vnLoad();
+  if(!vnSubscribed){
+    vnSubscribed=true;
+    sb.channel('vn').on('postgres_changes',{event:'UPDATE',schema:'public',table:'vn_session',filter:'id=eq.couple'},(p)=>{vnApply(p.new);}).subscribe();
+  }
+}
+function vnChangeRole(){
+  vnRole=null;localStorage.removeItem('gl_vn_role');
+  document.getElementById('vnPick').style.display='block';
+  document.getElementById('vnScene').classList.remove('on');
+  document.getElementById('vnFinal').classList.remove('on');
+}
+async function vnLoad(){
+  const {data}=await sb.from('vn_session').select('*').eq('id','couple').single();
+  if(data)vnApply(data);
+}
+async function vnReset(){
+  if(!sb)return;
+  await sb.from('vn_session').update({scene_index:0,aquiles_choice:null,giovana_choice:null,history:[],updated_at:new Date().toISOString()}).eq('id','couple');
+}
+function vnApply(s){
+  vnState=s;
+  const idx=s.scene_index|0;
+  const sceneEl=document.getElementById('vnScene');
+  const finalEl=document.getElementById('vnFinal');
+  if(idx>=VN_SCENES.length){
+    sceneEl.classList.remove('on');
+    finalEl.classList.add('on');
+    document.getElementById('vnFinalNarr').textContent=vnFinalMessage(Array.isArray(s.history)?s.history:[]);
+    return;
+  }
+  finalEl.classList.remove('on');
+  sceneEl.classList.add('on');
+  const scene=VN_SCENES[idx];
+  document.getElementById('vnEmoji').textContent=scene.emoji;
+  document.getElementById('vnNarr').textContent=scene.narr;
+  document.getElementById('vnQ').textContent=`Cena ${idx+1} de ${VN_SCENES.length} — ${scene.q}`;
+  const opts=scene[vnRole]||[];
+  const myChoice=vnRole==='aquiles'?s.aquiles_choice:s.giovana_choice;
+  const otherChoice=vnRole==='aquiles'?s.giovana_choice:s.aquiles_choice;
+  const otherName=vnRole==='aquiles'?'👑 Giovana':'🤴 Aquiles';
+  const optsEl=document.getElementById('vnOpts');optsEl.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='vn-opt'+(myChoice===o.k?' picked':'')+(myChoice?' disabled':'');
+    b.textContent=o.t;
+    b.onclick=()=>vnChoose(o.k);
+    optsEl.appendChild(b);
+  });
+  const stat=document.getElementById('vnStatus');
+  if(myChoice && !otherChoice) stat.textContent=`Você escolheu ✓ — esperando ${otherName}…`;
+  else if(!myChoice && otherChoice) stat.textContent=`${otherName} já escolheu ✓ — sua vez 🌹`;
+  else if(!myChoice && !otherChoice) stat.textContent='Escolha sua opção 💫';
+  else stat.textContent='Os dois escolheram 💕 indo pra próxima cena…';
+  // If both chose, the scene will advance below (any client can do it)
+  if(s.aquiles_choice && s.giovana_choice && !vnBusy){
+    vnBusy=true;
+    setTimeout(()=>vnAdvance(),1100);
+  }
+}
+async function vnChoose(k){
+  if(!sb||!vnRole)return;
+  const col=vnRole==='aquiles'?'aquiles_choice':'giovana_choice';
+  const cur=vnRole==='aquiles'?vnState.aquiles_choice:vnState.giovana_choice;
+  if(cur)return;
+  await sb.from('vn_session').update({[col]:k,updated_at:new Date().toISOString()}).eq('id','couple');
+}
+async function vnAdvance(){
+  // Only advance if the local state still shows both choices and we haven't already advanced
+  const {data:s}=await sb.from('vn_session').select('*').eq('id','couple').single();
+  if(!s||!s.aquiles_choice||!s.giovana_choice){vnBusy=false;return;}
+  const history=Array.isArray(s.history)?[...s.history]:[];
+  history.push({scene:s.scene_index,a:s.aquiles_choice,g:s.giovana_choice});
+  await sb.from('vn_session').update({scene_index:(s.scene_index|0)+1,aquiles_choice:null,giovana_choice:null,history,updated_at:new Date().toISOString()}).eq('id','couple');
+  vnBusy=false;
+}
+// auto-restore vn role
+(function(){const r=localStorage.getItem('gl_vn_role');if(r==='aquiles'||r==='giovana'){vnSetRole(r);} })();
 
 // REVEAL
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:0.08});
