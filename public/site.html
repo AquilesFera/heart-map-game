@@ -150,6 +150,63 @@ footer{background:var(--bk);text-align:center;padding:80px 20px 60px;border-top:
 @keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
 .rv{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
 .rv.vis{opacity:1;transform:translateY(0)}
+
+/* === LOGIN GATE === */
+#gate{position:fixed;inset:0;z-index:99999;background:radial-gradient(ellipse at center,#1a0510 0%,#060306 80%);display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .8s ease}
+#gate.gone{opacity:0;pointer-events:none}
+.gate-card{max-width:380px;width:100%;text-align:center;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.25);border-radius:22px;padding:44px 30px;backdrop-filter:blur(8px);position:relative;animation:fU 1s ease forwards}
+.gate-rose{font-size:54px;margin-bottom:14px;animation:hb 1.8s ease-in-out infinite}
+.gate-card h1{font-size:26px;font-weight:300;background:linear-gradient(135deg,var(--gold),var(--pink),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;letter-spacing:1px}
+.gate-sub{color:var(--pink);font-style:italic;font-size:13px;margin-bottom:26px;opacity:.85}
+.gate-input{width:100%;background:rgba(6,3,6,.6);border:1px solid rgba(212,175,55,.3);border-radius:12px;padding:14px 18px;color:var(--cr);font-family:Georgia,serif;font-size:15px;text-align:center;letter-spacing:2px;outline:none;transition:.3s}
+.gate-input:focus{border-color:var(--gold);background:rgba(6,3,6,.8)}
+.gate-input::placeholder{color:rgba(232,160,180,.4);letter-spacing:1px}
+.gate-btn{margin-top:14px;width:100%;background:linear-gradient(135deg,var(--wine),var(--rose));border:none;color:var(--cr);padding:13px;border-radius:12px;font-family:Georgia,serif;font-size:14px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:.3s}
+.gate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(196,80,110,.4)}
+.gate-err{color:#f5a0b4;font-style:italic;font-size:12px;margin-top:14px;min-height:18px;opacity:0;transition:.3s}
+.gate-err.show{opacity:1}
+.gate-card.shake{animation:shk .5s}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.gate-foot{margin-top:18px;color:rgba(232,160,180,.45);font-size:11px;font-style:italic;letter-spacing:1px}
+#logout-link{color:rgba(212,175,55,.4);font-size:11px;text-decoration:none;margin-top:14px;display:inline-block;letter-spacing:2px}
+#logout-link:hover{color:var(--gold)}
+
+/* === VISUAL NOVEL === */
+#aventura{background:radial-gradient(ellipse at top,#1a0a18 0%,#060306 70%);min-height:100vh}
+.vn-box{max-width:680px;margin:0 auto}
+.vn-pick{text-align:center;padding:30px 0}
+.vn-pick p{color:var(--pink);font-style:italic;font-size:15px;margin-bottom:24px}
+.vn-pick-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.vn-pick-btn{background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-radius:16px;padding:24px 26px;color:var(--cr);font-family:Georgia,serif;font-size:16px;cursor:pointer;transition:.3s;min-width:160px}
+.vn-pick-btn:hover{background:rgba(212,175,55,.14);border-color:var(--gold);transform:translateY(-3px)}
+.vn-pick-btn .vn-pi{font-size:36px;display:block;margin-bottom:8px}
+.vn-scene{background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.2);border-radius:22px;padding:36px 30px;display:none}
+.vn-scene.on{display:block;animation:fU .8s ease}
+.vn-emoji{font-size:60px;text-align:center;margin-bottom:14px}
+.vn-narr{color:var(--cr);font-size:16px;line-height:1.85;font-style:italic;text-align:center;margin-bottom:22px;white-space:pre-line}
+.vn-q{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:16px}
+.vn-opts{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:560px){.vn-opts{grid-template-columns:1fr}}
+.vn-opt{background:rgba(196,80,110,.08);border:1px solid rgba(196,80,110,.3);border-radius:13px;padding:16px;color:var(--cr);font-family:Georgia,serif;font-size:14px;cursor:pointer;transition:.3s;line-height:1.45}
+.vn-opt:hover{background:rgba(196,80,110,.18);border-color:var(--rose);transform:scale(1.02)}
+.vn-opt.picked{background:rgba(212,175,55,.18);border-color:var(--gold);color:var(--gold)}
+.vn-opt.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.vn-status{margin-top:18px;text-align:center;color:var(--pink);font-size:13px;font-style:italic;min-height:20px}
+.vn-who{text-align:center;color:var(--gold);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;opacity:.75}
+.vn-who b{color:var(--rose)}
+.vn-actions{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.vn-mini{background:transparent;border:1px solid rgba(212,175,55,.4);color:var(--gold);padding:9px 20px;border-radius:24px;font-family:Georgia,serif;font-size:11px;letter-spacing:2px;cursor:pointer;transition:.3s}
+.vn-mini:hover{background:rgba(212,175,55,.12)}
+.vn-final{text-align:center}
+.vn-final h3{font-size:26px;color:var(--gold);margin-bottom:14px;font-weight:300}
+.vn-final .vn-narr{font-size:17px}
+
+/* === MEM ONLINE EXTRA === */
+.mem-pick{text-align:center;padding:20px 0 30px}
+.mem-pick p{color:var(--pink);font-style:italic;font-size:14px;margin-bottom:18px}
+.mem-turn{text-align:center;color:var(--gold);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;min-height:18px}
+.mem-turn.mine{color:var(--rose)}
+.mem-card.locked-other{cursor:not-allowed;opacity:.92}
 @media(max-width:700px){
   .tl::before{left:16px}.ti,.ti:nth-child(even){padding-left:48px;padding-right:0;justify-content:flex-start}.td{left:16px}.tb{max-width:100%}
   nav ul{gap:10px}.lw{padding:34px 22px}.cg{gap:12px}.cc{width:135px;padding:22px 16px}
