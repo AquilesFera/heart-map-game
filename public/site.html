@@ -373,10 +373,21 @@ Eu fiz hm.</p>
 
 <section id="memoria">
   <div class="st rv"><div class="sl"></div><h2>Jogo da Memória</h2><p>ache todos os nossos momentos 🃏</p><div class="sl"></div></div>
+  <div class="mem-pick" id="memPick">
+    <p>Quem está jogando agora?</p>
+    <div class="vn-pick-btns">
+      <button class="vn-pick-btn" onclick="memSetRole('aquiles')"><span class="vn-pi">🤴</span>Sou o Aquiles</button>
+      <button class="vn-pick-btn" onclick="memSetRole('giovana')"><span class="vn-pi">👑</span>Sou a Giovana</button>
+    </div>
+  </div>
+  <div id="memPlay" style="display:none">
+    <div class="vn-who" id="memWhoAmI"></div>
+    <div class="mem-turn" id="memTurn"></div>
   <div class="rv">
     <div class="mem-info">
       <div class="mem-stat"><div class="mem-stat-n" id="mPares">0/8</div><div class="mem-stat-l">pares</div></div>
-      <div class="mem-stat"><div class="mem-stat-n" id="mTent">0</div><div class="mem-stat-l">tentativas</div></div>
+      <div class="mem-stat"><div class="mem-stat-n" id="memScoreA">0</div><div class="mem-stat-l">🤴 Aquiles</div></div>
+      <div class="mem-stat"><div class="mem-stat-n" id="memScoreG">0</div><div class="mem-stat-l">👑 Giovana</div></div>
     </div>
     <div class="mem-grid" id="memGrid"></div>
     <div class="mem-win" id="memWin">
@@ -384,6 +395,7 @@ Eu fiz hm.</p>
       <p id="memWinMsg"></p>
       <button class="mem-restart" onclick="initMemory()">Jogar de novo 🔄</button>
     </div>
+  </div>
   </div>
   <div class="mem-msg-pop" id="memPop"></div>
 </section>
