@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      game_session: {
+        Row: {
+          adir: string
+          amov: boolean
+          ax: number
+          ay: number
+          collected: Json
+          finished: boolean
+          gdir: string
+          gmov: boolean
+          gx: number
+          gy: number
+          hearts: Json
+          id: string
+          messages: Json
+          updated_at: string
+        }
+        Insert: {
+          adir?: string
+          amov?: boolean
+          ax?: number
+          ay?: number
+          collected?: Json
+          finished?: boolean
+          gdir?: string
+          gmov?: boolean
+          gx?: number
+          gy?: number
+          hearts?: Json
+          id?: string
+          messages?: Json
+          updated_at?: string
+        }
+        Update: {
+          adir?: string
+          amov?: boolean
+          ax?: number
+          ay?: number
+          collected?: Json
+          finished?: boolean
+          gdir?: string
+          gmov?: boolean
+          gx?: number
+          gy?: number
+          hearts?: Json
+          id?: string
+          messages?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mem_session: {
         Row: {
           flipped: Json
@@ -43,33 +94,6 @@ export type Database = {
           score_g?: number
           seed?: number
           turn?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      vn_session: {
-        Row: {
-          aquiles_choice: string | null
-          giovana_choice: string | null
-          history: Json
-          id: string
-          scene_index: number
-          updated_at: string
-        }
-        Insert: {
-          aquiles_choice?: string | null
-          giovana_choice?: string | null
-          history?: Json
-          id?: string
-          scene_index?: number
-          updated_at?: string
-        }
-        Update: {
-          aquiles_choice?: string | null
-          giovana_choice?: string | null
-          history?: Json
-          id?: string
-          scene_index?: number
           updated_at?: string
         }
         Relationships: []
