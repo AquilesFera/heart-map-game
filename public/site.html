@@ -372,6 +372,42 @@ Eu fiz hm.</p>
 </section>
 
 <section id="memoria">
+</section>
+
+<section id="aventura">
+  <div class="st rv"><div class="sl"></div><h2>Nossa Aventura</h2><p>uma história só nossa, decidida juntos 💫</p><div class="sl"></div></div>
+  <div class="vn-box rv">
+    <div class="vn-pick" id="vnPick">
+      <p>Quem está jogando agora?</p>
+      <div class="vn-pick-btns">
+        <button class="vn-pick-btn" onclick="vnSetRole('aquiles')"><span class="vn-pi">🤴</span>Sou o Aquiles</button>
+        <button class="vn-pick-btn" onclick="vnSetRole('giovana')"><span class="vn-pi">👑</span>Sou a Giovana</button>
+      </div>
+    </div>
+    <div class="vn-scene" id="vnScene">
+      <div class="vn-who" id="vnWhoAmI"></div>
+      <div class="vn-emoji" id="vnEmoji">🌅</div>
+      <p class="vn-narr" id="vnNarr"></p>
+      <p class="vn-q" id="vnQ"></p>
+      <div class="vn-opts" id="vnOpts"></div>
+      <p class="vn-status" id="vnStatus"></p>
+      <div class="vn-actions">
+        <button class="vn-mini" onclick="vnReset()">🔄 Recomeçar</button>
+        <button class="vn-mini" onclick="vnChangeRole()">↺ Trocar de personagem</button>
+      </div>
+    </div>
+    <div class="vn-scene vn-final" id="vnFinal">
+      <div class="vn-emoji">🌹</div>
+      <h3 id="vnFinalTitle">Nosso final</h3>
+      <p class="vn-narr" id="vnFinalNarr"></p>
+      <div class="vn-actions">
+        <button class="vn-mini" onclick="vnReset()">💕 Reviver nossa aventura</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="memoria">
   <div class="st rv"><div class="sl"></div><h2>Jogo da Memória</h2><p>ache todos os nossos momentos 🃏</p><div class="sl"></div></div>
   <div class="mem-pick" id="memPick">
     <p>Quem está jogando agora?</p>
