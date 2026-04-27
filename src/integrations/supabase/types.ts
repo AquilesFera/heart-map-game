@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      mem_session: {
+        Row: {
+          flipped: Json
+          id: string
+          matched: Json
+          score_a: number
+          score_g: number
+          seed: number
+          turn: string
+          updated_at: string
+        }
+        Insert: {
+          flipped?: Json
+          id?: string
+          matched?: Json
+          score_a?: number
+          score_g?: number
+          seed?: number
+          turn?: string
+          updated_at?: string
+        }
+        Update: {
+          flipped?: Json
+          id?: string
+          matched?: Json
+          score_a?: number
+          score_g?: number
+          seed?: number
+          turn?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vn_session: {
+        Row: {
+          aquiles_choice: string | null
+          giovana_choice: string | null
+          history: Json
+          id: string
+          scene_index: number
+          updated_at: string
+        }
+        Insert: {
+          aquiles_choice?: string | null
+          giovana_choice?: string | null
+          history?: Json
+          id?: string
+          scene_index?: number
+          updated_at?: string
+        }
+        Update: {
+          aquiles_choice?: string | null
+          giovana_choice?: string | null
+          history?: Json
+          id?: string
+          scene_index?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
