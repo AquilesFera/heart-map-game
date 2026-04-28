@@ -70,6 +70,7 @@ export type Database = {
           flipped: Json
           id: string
           matched: Json
+          room_code: string | null
           score_a: number
           score_g: number
           seed: number
@@ -80,6 +81,7 @@ export type Database = {
           flipped?: Json
           id?: string
           matched?: Json
+          room_code?: string | null
           score_a?: number
           score_g?: number
           seed?: number
@@ -90,10 +92,83 @@ export type Database = {
           flipped?: Json
           id?: string
           matched?: Json
+          room_code?: string | null
           score_a?: number
           score_g?: number
           seed?: number
           turn?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      room: {
+        Row: {
+          actions: Json
+          adir: string
+          amov: boolean
+          ax: number
+          ay: number
+          code: string
+          coins_g: number
+          created_at: string
+          form_g: string | null
+          gdir: string
+          gmov: boolean
+          gx: number
+          gy: number
+          hearts: Json
+          inv_a: Json
+          inv_g: Json
+          money_a: number
+          player_a: string | null
+          player_g: string | null
+          scene: string
+          updated_at: string
+        }
+        Insert: {
+          actions?: Json
+          adir?: string
+          amov?: boolean
+          ax?: number
+          ay?: number
+          code: string
+          coins_g?: number
+          created_at?: string
+          form_g?: string | null
+          gdir?: string
+          gmov?: boolean
+          gx?: number
+          gy?: number
+          hearts?: Json
+          inv_a?: Json
+          inv_g?: Json
+          money_a?: number
+          player_a?: string | null
+          player_g?: string | null
+          scene?: string
+          updated_at?: string
+        }
+        Update: {
+          actions?: Json
+          adir?: string
+          amov?: boolean
+          ax?: number
+          ay?: number
+          code?: string
+          coins_g?: number
+          created_at?: string
+          form_g?: string | null
+          gdir?: string
+          gmov?: boolean
+          gx?: number
+          gy?: number
+          hearts?: Json
+          inv_a?: Json
+          inv_g?: Json
+          money_a?: number
+          player_a?: string | null
+          player_g?: string | null
+          scene?: string
           updated_at?: string
         }
         Relationships: []
