@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Giovana Lima 🌹 — Aquiles</title>
+<title>Site Giovana 🌹</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bk:#060306;--wine:#6b1a2e;--rose:#c0506e;--pink:#e8a0b4;--gold:#d4af37;--lg:#f0d870;--cr:#f5e6ea}
@@ -226,8 +226,8 @@ footer{background:var(--bk);text-align:center;padding:80px 20px 60px;border-top:
 <div id="gate">
   <div class="gate-card" id="gateCard">
     <div class="gate-rose">🌹</div>
-    <h1>Só pra nós dois</h1>
-    <p class="gate-sub">Digite a senha</p>
+    <h1>Site Giovana</h1>
+    <p class="gate-sub">Digite a senha pra entrar</p>
     <input id="gateInput" class="gate-input" type="password" placeholder="senha" autocomplete="off">
     <button id="gateBtn" class="gate-btn">Entrar</button>
     <p id="gateErr" class="gate-err"></p>
@@ -497,11 +497,11 @@ const sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null
     const v=(inp.value||'').trim().toLowerCase();
     if(v==='florsinha'){
       localStorage.setItem(KEY,'1');
-      err.textContent='Bem-vinda meu amor 🌹';err.classList.add('show');err.style.color='#f0d870';
-      setTimeout(unlock,650);
+      err.textContent='Bem-vinda 🌹';err.classList.add('show');err.style.color='#f0d870';
+      setTimeout(unlock,500);
     }else{
       card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake');
-      err.textContent='Hmm… não é essa, meu amor 🌹';err.classList.add('show');
+      err.textContent='Senha incorreta 🌹';err.classList.add('show');
       inp.value='';inp.focus();
     }
   }
@@ -515,14 +515,15 @@ const pe=['🌸','🌹','🌷','✨','💕','🌺'];
 function mkP(){const p=document.createElement('div');p.className='petal';p.textContent=pe[Math.floor(Math.random()*pe.length)];p.style.cssText=`left:${Math.random()*100}vw;font-size:${11+Math.random()*13}px;animation-duration:${7+Math.random()*7}s;animation-delay:${Math.random()*2}s;`;pw.appendChild(p);setTimeout(()=>p.remove(),16000);}
 setInterval(mkP,700);
 
-// HERO — fotos renomeadas com prefixo hero- para evitar conflito
+// HERO — fotos servidas do Netlify (mesma estrutura de pastas)
+const NETLIFY='https://giolimaminhavida.netlify.app/';
 const hSlides=[
-  'fotos/hero-amor-2.jpeg',
-  'fotos/hero-amor-3.jpeg',
-  'fotos/hero-mor-10.jpg',
-  'fotos/mor-11.jpg',
-  'fotos/01-55-50-1.jpeg',
-  'fotos/01-55-52-3.jpeg'
+  NETLIFY+'fotos/hero-amor-2.jpeg',
+  NETLIFY+'fotos/hero-amor-3.jpeg',
+  NETLIFY+'fotos/hero-mor-10.jpg',
+  NETLIFY+'fotos/mor-11.jpg',
+  NETLIFY+'fotos/01-55-50-1.jpeg',
+  NETLIFY+'fotos/01-55-52-3.jpeg'
 ];
 const hw=document.getElementById('hs');
 hSlides.forEach((u,i)=>{const d=document.createElement('div');d.className='hero-slide'+(i===0?' active':'');d.style.backgroundImage=`url(${u})`;hw.appendChild(d);});
@@ -585,8 +586,8 @@ const photos=[
   {u:'fotos/01-55-55.jpeg',c:'zu',l:'Zueira 😂'},
 ];
 const galGrid=document.getElementById('galGrid');
-let lbUrls=photos.map(p=>p.u),lbI=0;
-photos.forEach((ph,i)=>{const el=document.createElement('div');el.className='gi show';el.dataset.cat=ph.c;el.dataset.i=i;el.innerHTML=`<img src="${ph.u}" alt="${ph.l}" loading="lazy"><div class="gov"><span>${ph.l}</span></div>`;el.addEventListener('click',()=>olb(i));galGrid.appendChild(el);});
+let lbUrls=photos.map(p=>NETLIFY+p.u),lbI=0;
+photos.forEach((ph,i)=>{const el=document.createElement('div');el.className='gi show';el.dataset.cat=ph.c;el.dataset.i=i;el.innerHTML=`<img src="${NETLIFY}${ph.u}" alt="${ph.l}" loading="lazy"><div class="gov"><span>${ph.l}</span></div>`;el.addEventListener('click',()=>olb(i));galGrid.appendChild(el);});
 function fg(cat,btn){document.querySelectorAll('.gt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.querySelectorAll('.gi').forEach(el=>el.classList.toggle('show',cat==='all'||el.dataset.cat===cat));}
 function olb(i){lbI=i;document.getElementById('lb-img').src=lbUrls[i];document.getElementById('lb').classList.add('open');}
 function clb(){document.getElementById('lb').classList.remove('open');}
@@ -648,14 +649,14 @@ startQuiz();
 
 // === MEMÓRIA ONLINE (Supabase Realtime, turn-based) ===
 const memCards=[
-  {u:'fotos/mor-12.jpg',msg:'Ela 🌹 — A mulher mais linda do mundo inteiro'},
-  {u:'fotos/amor-2.jpeg',msg:'Giovana ✨ — Seu sorriso é o que me faz te amar mais cada dia'},
-  {u:'fotos/01-55-52.jpeg',msg:'Nós dois 💕 — Desde o começo já sabia que era você'},
-  {u:'fotos/nos-3.jpeg',msg:'Juntos 🌙 — Todo lugar fica melhor com você do meu lado'},
-  {u:'fotos/01-55-50.jpeg',msg:'Halloween 🎃 — Dexter e sua parceira — somos feitos um pro outro'},
-  {u:'fotos/01-55-52-1.jpeg',msg:'06/01/2026 💍 — O dia que você disse sim e mudou minha vida'},
-  {u:'fotos/nos-fofi.jpeg',msg:'Fofos 🥰 — Assim a gente fica para sempre'},
-  {u:'fotos/nos-2.jpeg',msg:'Nosso jeitinho 🤍 — Te quero pra sempre assim, do meu lado'},
+  {u:NETLIFY+'fotos/mor-12.jpg',msg:'Ela 🌹 — A mulher mais linda do mundo inteiro'},
+  {u:NETLIFY+'fotos/amor-2.jpeg',msg:'Giovana ✨ — Seu sorriso é o que me faz te amar mais cada dia'},
+  {u:NETLIFY+'fotos/01-55-52.jpeg',msg:'Nós dois 💕 — Desde o começo já sabia que era você'},
+  {u:NETLIFY+'fotos/nos-3.jpeg',msg:'Juntos 🌙 — Todo lugar fica melhor com você do meu lado'},
+  {u:NETLIFY+'fotos/01-55-50.jpeg',msg:'Halloween 🎃 — Dexter e sua parceira — somos feitos um pro outro'},
+  {u:NETLIFY+'fotos/01-55-52-1.jpeg',msg:'06/01/2026 💍 — O dia que você disse sim e mudou minha vida'},
+  {u:NETLIFY+'fotos/nos-fofi.jpeg',msg:'Fofos 🥰 — Assim a gente fica para sempre'},
+  {u:NETLIFY+'fotos/nos-2.jpeg',msg:'Nosso jeitinho 🤍 — Te quero pra sempre assim, do meu lado'},
 ];
 function memShuffle(seed){
   // mulberry32 deterministic shuffle so both phones see the same board
