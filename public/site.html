@@ -793,11 +793,11 @@ function memSetRole(role){
   memLoad();
   if(!memSubscribed){
     memSubscribed=true;
-    sb.channel('mem').on('postgres_changes',{event:'UPDATE',schema:'public',table:'mem_session',filter:'id=eq.couple'},(p)=>{memApply(p.new);}).subscribe();
+    sb.channel('mem').on('postgres_changes',{event:'UPDATE',schema:'public',table:'mem_session',filter:'id=eq.'+RID()},(p)=>{memApply(p.new);}).subscribe();
   }
 }
 async function memLoad(){
-  const {data}=await sb.from('mem_session').select('*').eq('id','couple').single();
+  const {data}=await sb.from('mem_session').select('*').eq('id',RID()).single();
   if(data)memApply(data);
 }
 function memApply(s){
@@ -849,7 +849,7 @@ async function memFlip(idx){
   if(flipped.length>=2)return;
   if(flipped.includes(idx)||matched.includes(idx))return;
   flipped.push(idx);
-  await sb.from('mem_session').update({flipped,updated_at:new Date().toISOString()}).eq('id','couple');
+  await sb.from('mem_session').update({flipped,updated_at:new Date().toISOString()}).eq('id',RID());
 }
 async function memResolve(){
   const flipped=Array.isArray(memState.flipped)?memState.flipped:[];
@@ -867,13 +867,13 @@ async function memResolve(){
   }else{
     newTurn=memState.turn==='aquiles'?'giovana':'aquiles';
   }
-  await sb.from('mem_session').update({flipped:[],matched:newMatched,turn:newTurn,score_a:scoreA,score_g:scoreG,updated_at:new Date().toISOString()}).eq('id','couple');
+  await sb.from('mem_session').update({flipped:[],matched:newMatched,turn:newTurn,score_a:scoreA,score_g:scoreG,updated_at:new Date().toISOString()}).eq('id',RID());
   memBusy=false;
 }
 async function initMemory(){
   if(!sb)return;
   const seed=Math.floor(Math.random()*1000000);
-  await sb.from('mem_session').update({seed,flipped:[],matched:[],turn:'aquiles',score_a:0,score_g:0,updated_at:new Date().toISOString()}).eq('id','couple');
+  await sb.from('mem_session').update({seed,flipped:[],matched:[],turn:'aquiles',score_a:0,score_g:0,updated_at:new Date().toISOString()}).eq('id',RID());
 }
 // (auto-restore de role ocorre depois que o usuário entra na sala — ver roomBoot)
 
@@ -940,7 +940,7 @@ function g2SetRole(role){
   g2Load();
   if(!g2Subscribed){
     g2Subscribed=true;
-    sb.channel('g2').on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_session',filter:'id=eq.couple'},(p)=>g2Apply(p.new)).subscribe();
+    sb.channel('g2').on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_session',filter:'id=eq.'+RID()},(p)=>g2Apply(p.new)).subscribe();
   }
   g2BindControls();
   if(!g2RAF) g2Loop(performance.now());
@@ -954,11 +954,11 @@ function g2ChangeRole(){
 }
 
 async function g2Load(){
-  const {data}=await sb.from('game_session').select('*').eq('id','couple').single();
+  const {data}=await sb.from('game_session').select('*').eq('id',RID()).single();
   if(data){
     if(!Array.isArray(data.hearts)||data.hearts.length===0){
       // primeira vez — semeia os corações
-      await sb.from('game_session').update({hearts:G2_HEART_SPOTS,collected:[],updated_at:new Date().toISOString()}).eq('id','couple');
+      await sb.from('game_session').update({hearts:G2_HEART_SPOTS,collected:[],updated_at:new Date().toISOString()}).eq('id',RID());
     } else {
       g2Apply(data);
     }
@@ -972,7 +972,7 @@ async function g2Reset(){
     gx:760,gy:360,gdir:'down',gmov:false,
     hearts:G2_HEART_SPOTS,collected:[],messages:[],finished:false,
     updated_at:new Date().toISOString()
-  }).eq('id','couple');
+  }).eq('id',RID());
   g2Local={x:g2Role==='aquiles'?120:760,y:360,dir:'down',mov:false};
 }
 
@@ -1086,7 +1086,7 @@ function g2QueueSync(){
   const patch=g2Role==='aquiles'
     ? {ax:Math.round(g2Local.x),ay:Math.round(g2Local.y),adir:g2Local.dir,amov:g2Local.mov,updated_at:new Date().toISOString()}
     : {gx:Math.round(g2Local.x),gy:Math.round(g2Local.y),gdir:g2Local.dir,gmov:g2Local.mov,updated_at:new Date().toISOString()};
-  sb.from('game_session').update(patch).eq('id','couple').then(()=>{},()=>{});
+  sb.from('game_session').update(patch).eq('id',RID()).then(()=>{},()=>{});
 }
 
 let g2HeartBusy=false, g2BumpBusy=false, g2LastBumpAt=0;
@@ -1112,7 +1112,7 @@ async function g2CheckHearts(){
         const msgs=Array.isArray(g2State.messages)?[...g2State.messages]:[];
         msgs.push({t:Date.now(),text:'💗 '+h.msg});
         const finished=newCollected.length>=hearts.length;
-        await sb.from('game_session').update({collected:newCollected,messages:msgs.slice(-8),finished,updated_at:new Date().toISOString()}).eq('id','couple');
+        await sb.from('game_session').update({collected:newCollected,messages:msgs.slice(-8),finished,updated_at:new Date().toISOString()}).eq('id',RID());
         setTimeout(()=>{g2HeartBusy=false;},400);
         break;
       }
@@ -1125,7 +1125,7 @@ async function g2CheckHearts(){
     const t=G2_NEAR_MSGS[Math.floor(Math.random()*G2_NEAR_MSGS.length)];
     const msgs=Array.isArray(g2State.messages)?[...g2State.messages]:[];
     msgs.push({t:Date.now(),text:t});
-    await sb.from('game_session').update({messages:msgs.slice(-8),updated_at:new Date().toISOString()}).eq('id','couple');
+    await sb.from('game_session').update({messages:msgs.slice(-8),updated_at:new Date().toISOString()}).eq('id',RID());
     setTimeout(()=>{g2BumpBusy=false;},500);
   }
 }
