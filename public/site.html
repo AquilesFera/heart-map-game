@@ -954,15 +954,17 @@ function g2ChangeRole(){
 }
 
 async function g2Load(){
-  const {data}=await sb.from('game_session').select('*').eq('id',RID()).single();
-  if(data){
-    if(!Array.isArray(data.hearts)||data.hearts.length===0){
-      // primeira vez — semeia os corações
-      await sb.from('game_session').update({hearts:G2_HEART_SPOTS,collected:[],updated_at:new Date().toISOString()}).eq('id',RID());
-    } else {
-      g2Apply(data);
-    }
+  // garante que a row existe pra essa sala
+  let {data}=await sb.from('game_session').select('*').eq('id',RID()).maybeSingle();
+  if(!data){
+    await sb.from('game_session').insert({id:RID(),hearts:G2_HEART_SPOTS,collected:[],messages:[]});
+    const r=await sb.from('game_session').select('*').eq('id',RID()).maybeSingle();
+    data=r.data;
+  } else if(!Array.isArray(data.hearts)||data.hearts.length===0){
+    await sb.from('game_session').update({hearts:G2_HEART_SPOTS,collected:[],updated_at:new Date().toISOString()}).eq('id',RID());
+    data.hearts=G2_HEART_SPOTS; data.collected=[];
   }
+  if(data) g2Apply(data);
 }
 
 async function g2Reset(){
