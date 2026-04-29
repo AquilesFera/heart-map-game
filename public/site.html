@@ -1415,6 +1415,7 @@ async function roomSubscribe(){
     .subscribe();
 }
 function roomApply(s){
+  const prevScene = roomState ? roomState.scene : null;
   roomState=s;
   // HUD saldos
   const hg=document.getElementById('hudCoinsG'); if(hg) hg.textContent='💗 '+(s.coins_g||0);
@@ -1435,6 +1436,17 @@ function roomApply(s){
   const total=Object.values(inv_a).reduce((a,b)=>a+(Number(b)||0),0);
   const btnD=document.getElementById('btnDeliver');
   if(btnD) btnD.style.display = (g2Role==='aquiles' && total>0) ? 'inline-block':'none';
+  // ----- Sincroniza troca de cenário entre os dois jogadores -----
+  if(prevScene && s.scene && prevScene !== s.scene){
+    const start = (typeof SCENE_STARTS!=='undefined' && SCENE_STARTS[s.scene]) ? SCENE_STARTS[s.scene] : null;
+    if(start && g2Role){
+      const my = (g2Role==='aquiles') ? start.a : start.g;
+      const ot = (g2Role==='aquiles') ? start.g : start.a;
+      g2Local.x = my.x; g2Local.y = my.y; g2Local.dir='down'; g2Local.mov=false; g2Local._init=true;
+      g2Remote.x = ot.x; g2Remote.y = ot.y; g2Remote.dir='down'; g2Remote.mov=false;
+    }
+    showToast('Cenário: '+s.scene+' ✨');
+  }
   // animação de ações efêmeras
   const acts=Array.isArray(s.actions)?s.actions:[];
   if(acts.length){
