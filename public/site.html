@@ -602,6 +602,8 @@ const sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null
     gate.classList.add('gone');
     setTimeout(()=>gate.remove(),900);
     document.body.style.overflow='auto';
+    // após o gate, mostrar tela de sala (ou auto-entrar se já tinha sala)
+    setTimeout(()=>roomBoot(),300);
   }
   if(localStorage.getItem(KEY)==='1'){unlock();return;}
   document.body.style.overflow='hidden';
