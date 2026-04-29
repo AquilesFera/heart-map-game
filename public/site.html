@@ -1325,6 +1325,23 @@ function roomHide(){
 function roomShowJoin(){ roomShow('roomJoin'); setTimeout(()=>document.getElementById('roomCodeIn').focus(),100); }
 function roomBack(){ roomShow('roomHome'); }
 
+// Mostra/esconde os "gates de sala" inline dentro das seções de jogo
+function renderRoomGate(){
+  const inRoom = !!localStorage.getItem('gl_room') && localStorage.getItem('gl_room')!=='couple';
+  const g2Gate=document.getElementById('g2RoomGate');
+  const g2Wrap=document.getElementById('g2GameWrap');
+  const memGate=document.getElementById('memRoomGate');
+  const memWrap=document.getElementById('memGameWrap');
+  if(g2Gate) g2Gate.style.display = inRoom?'none':'';
+  if(g2Wrap) g2Wrap.style.display = inRoom?'':'none';
+  if(memGate) memGate.style.display = inRoom?'none':'';
+  if(memWrap) memWrap.style.display = inRoom?'':'none';
+}
+
+// Abre o overlay de sala (a partir dos botões inline)
+function roomOpen(){ roomShow('roomHome'); }
+function roomCloseOverlay(){ roomHide(); }
+
 function roomBoot(){
   // tela de sala não é mais overlay fullscreen — fica dentro das seções de jogo.
   // se já tinha sala salva, reentra direto (sem mostrar overlay).
