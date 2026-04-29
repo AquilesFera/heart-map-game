@@ -489,13 +489,27 @@ Eu fiz hm.</p>
     </div>
     <div class="g2-stage" id="g2Stage">
       <div class="vn-who" id="g2WhoAmI"></div>
+      <div class="g2-scenes" id="g2Scenes">
+        <button data-scene="jardim" class="on" onclick="sceneSet('jardim')">🌷 Jardim</button>
+        <button data-scene="praia" onclick="sceneSet('praia')">🏖️ Praia</button>
+        <button data-scene="cinema" onclick="sceneSet('cinema')">🎬 Cinema</button>
+        <button data-scene="zoo" onclick="sceneSet('zoo')">🦁 Zoo</button>
+        <button data-scene="trabalho" id="sceneTrabalhoBtn" onclick="sceneSet('trabalho')">💻 Trabalho</button>
+      </div>
       <div class="g2-canvas-wrap">
         <canvas id="g2Canvas" width="880" height="495"></canvas>
         <div class="g2-bubble" id="g2Bubble"></div>
       </div>
       <div class="g2-hud">
         <span class="g2-hearts" id="g2Hearts">💗 0 / 0</span>
-        <span class="g2-tip">use as setinhas — encontrem-se 💕</span>
+        <span class="pill pink" id="hudCoinsG">💗 0</span>
+        <span class="pill gold" id="hudMoneyA">💵 R$ 0,00</span>
+        <span class="pill" id="hudRoom">sala —</span>
+        <button onclick="shopOpen()">🛒 Loja</button>
+        <button class="ghost" onclick="actKiss()">💋 Beijo</button>
+        <button class="ghost" onclick="actDeliver()" id="btnDeliver" style="display:none">🎁 Entregar</button>
+        <button class="ghost" onclick="actPower()" id="btnPower" style="display:none">✨ Poder</button>
+        <button class="ghost" onclick="roomLeave()">🚪 Sair da sala</button>
       </div>
       <div class="g2-pad" id="g2Pad" aria-label="Controles">
         <span class="g2-pad-empty"></span>
