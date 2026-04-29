@@ -219,6 +219,52 @@ footer{background:var(--bk);text-align:center;padding:80px 20px 60px;border-top:
   nav ul{gap:10px}.lw{padding:34px 22px}.cg{gap:12px}.cc{width:135px;padding:22px 16px}
   .q-opts{grid-template-columns:1fr}.mem-grid{grid-template-columns:repeat(4,1fr);gap:6px}
 }
+/* ============ ROOM (sala) ============ */
+#room{position:fixed;inset:0;z-index:99998;background:radial-gradient(ellipse at center,#1a0510 0%,#060306 80%);display:none;align-items:center;justify-content:center;padding:24px}
+#room.on{display:flex}
+.room-card{max-width:420px;width:100%;text-align:center;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.25);border-radius:22px;padding:36px 26px;backdrop-filter:blur(8px)}
+.room-card h2{font-size:24px;font-weight:300;background:linear-gradient(135deg,var(--gold),var(--pink),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;letter-spacing:1px}
+.room-card p.sub{color:var(--pink);font-style:italic;font-size:13px;margin-bottom:22px;opacity:.9}
+.room-actions{display:flex;flex-direction:column;gap:12px}
+.room-btn{background:linear-gradient(135deg,var(--wine),var(--rose));border:none;color:var(--cr);padding:13px;border-radius:12px;font-family:Georgia,serif;font-size:14px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.3s}
+.room-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(196,80,110,.4)}
+.room-btn.ghost{background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.3)}
+.room-input{width:100%;background:rgba(6,3,6,.6);border:1px solid rgba(212,175,55,.3);border-radius:12px;padding:14px;color:var(--cr);font-family:Georgia,serif;font-size:18px;text-align:center;letter-spacing:6px;outline:none}
+.room-code-show{font-family:Georgia,serif;font-size:32px;letter-spacing:8px;color:var(--gold);background:rgba(6,3,6,.6);padding:14px;border-radius:12px;border:1px dashed rgba(212,175,55,.4);margin:10px 0}
+.room-err{color:#f5a0b4;font-style:italic;font-size:12px;margin-top:10px;min-height:16px}
+.room-tag{display:inline-block;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:var(--gold);padding:4px 10px;border-radius:999px;font-size:11px;letter-spacing:2px;margin-top:8px}
+/* HUD do jogo */
+.g2-hud{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0 6px;align-items:center}
+.g2-hud .pill{background:rgba(6,3,6,.55);border:1px solid rgba(212,175,55,.28);color:var(--cr);padding:6px 12px;border-radius:999px;font-size:12px;letter-spacing:1px;display:inline-flex;align-items:center;gap:6px}
+.g2-hud .pill.gold{color:#f0d870}
+.g2-hud .pill.pink{color:#f5a0c4}
+.g2-hud button{background:linear-gradient(135deg,var(--wine),var(--rose));border:none;color:var(--cr);padding:7px 14px;border-radius:999px;font-family:Georgia,serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:.3s}
+.g2-hud button:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(196,80,110,.4)}
+.g2-hud button.ghost{background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.3)}
+.g2-scenes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px}
+.g2-scenes button{background:rgba(6,3,6,.55);border:1px solid rgba(212,175,55,.25);color:var(--cr);padding:6px 12px;border-radius:10px;font-size:12px;cursor:pointer;font-family:Georgia,serif;transition:.2s}
+.g2-scenes button.on{background:linear-gradient(135deg,var(--wine),var(--rose));border-color:transparent}
+.g2-scenes button:disabled{opacity:.4;cursor:not-allowed}
+/* Loja */
+#shop{position:fixed;inset:0;z-index:99997;background:rgba(6,3,6,.85);display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(6px)}
+#shop.on{display:flex}
+.shop-card{max-width:560px;width:100%;max-height:88vh;overflow:auto;background:linear-gradient(180deg,#1a0a14,#0a0508);border:1px solid rgba(212,175,55,.3);border-radius:20px;padding:24px}
+.shop-card h2{font-size:22px;font-weight:300;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;text-align:center}
+.shop-tabs{display:flex;gap:6px;justify-content:center;margin:14px 0}
+.shop-tabs button{background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);color:var(--cr);padding:8px 14px;border-radius:10px;cursor:pointer;font-family:Georgia,serif;font-size:13px}
+.shop-tabs button.on{background:linear-gradient(135deg,var(--wine),var(--rose));border-color:transparent}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:8px}
+.shop-item{background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.18);border-radius:14px;padding:14px 10px;text-align:center}
+.shop-item .emo{font-size:36px;line-height:1}
+.shop-item .nm{margin-top:6px;font-size:12px;color:var(--cr)}
+.shop-item .pr{margin-top:4px;font-size:11px;color:var(--gold)}
+.shop-item button{margin-top:8px;background:linear-gradient(135deg,var(--wine),var(--rose));border:none;color:var(--cr);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:11px;letter-spacing:1px;width:100%}
+.shop-item button:disabled{opacity:.4;cursor:not-allowed;background:#3a2028}
+.shop-item .own{font-size:10px;color:#f0d870;margin-top:4px}
+.shop-close{display:block;margin:14px auto 0;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.3);color:var(--cr);padding:8px 18px;border-radius:10px;cursor:pointer;font-family:Georgia,serif;font-size:12px}
+.shop-section-title{margin-top:14px;color:var(--pink);font-size:13px;letter-spacing:2px;text-align:center;font-style:italic}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#1a0a14,#2a1424);border:1px solid rgba(212,175,55,.4);color:var(--cr);padding:10px 18px;border-radius:14px;font-size:13px;z-index:99999;opacity:0;pointer-events:none;transition:.3s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
