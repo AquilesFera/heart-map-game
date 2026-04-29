@@ -1523,12 +1523,15 @@ const SCENE_STARTS={
 // Patch leve: encapsula o g2Render original.
 const _g2RenderOrig = g2Render;
 window.g2Render = function(){
-  // chama original
+  // chama original (que pinta fundo neutro nos outros cenários e depois personagens/corações)
   _g2RenderOrig();
-  // depois desenha overlay do cenário (PC, sol, telão, jaulas) + corações da economia
   const c=document.getElementById('g2Canvas'); if(!c||!roomState) return;
   const ctx=c.getContext('2d');
+  // desenha o cenário ATRÁS dos personagens usando destination-over
+  ctx.save();
+  ctx.globalCompositeOperation='destination-over';
   drawSceneOverlay(ctx, roomState.scene||'jardim');
+  ctx.restore();
   // corações de economia (flutuando) — só nos cenários ≠ trabalho
   const econ = Array.isArray(roomState.hearts)?roomState.hearts:[];
   if((roomState.scene||'jardim')!=='trabalho'){
