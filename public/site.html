@@ -590,6 +590,14 @@ const SB_URL='https://shiixsstlefukslauwod.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoaWl4c3N0bGVmdWtzbGF1d29kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjQ3MDUsImV4cCI6MjA5Mjg0MDcwNX0.khmVJQwRiTGpfZouyrdkgnpgJymLGNjQ3y3JzK7gCdw';
 const sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
 
+// === SALA ===
+// Toda a persistência (game_session, mem_session) usa este id.
+// Antes de entrar numa sala, fica em 'couple' (compatível com versão antiga).
+let _ROOM_CODE = localStorage.getItem('gl_room') || 'couple';
+function RID(){ return _ROOM_CODE; }
+function setRoomCode(c){ _ROOM_CODE = c; localStorage.setItem('gl_room', c); }
+function clearRoomCode(){ _ROOM_CODE = 'couple'; localStorage.removeItem('gl_room'); }
+
 // === LOGIN GATE (senha "Florsinha") ===
 (function(){
   const gate=document.getElementById('gate');
