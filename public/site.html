@@ -1280,6 +1280,441 @@ function g2DrawChar(ctx,p,who){
 
 // (auto-restore de role ocorre depois que o usuário entra na sala — ver roomBoot)
 
+// =====================================================================
+// ============ SISTEMA DE SALA + ECONOMIA + LOJA + CENÁRIOS ===========
+// =====================================================================
+
+function showToast(msg){
+  const t=document.getElementById('toast'); if(!t)return;
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ---------- TELA DE SALA ----------
+const ROOM_EL=()=>document.getElementById('room');
+function roomShow(which){
+  ROOM_EL().classList.add('on');
+  document.body.style.overflow='hidden';
+  ['roomHome','roomCreated','roomJoin'].forEach(id=>{
+    document.getElementById(id).style.display = (id===which)?'block':'none';
+  });
+}
+function roomHide(){
+  ROOM_EL().classList.remove('on');
+  document.body.style.overflow='auto';
+}
+function roomShowJoin(){ roomShow('roomJoin'); setTimeout(()=>document.getElementById('roomCodeIn').focus(),100); }
+function roomBack(){ roomShow('roomHome'); }
+
+function roomBoot(){
+  // se já tinha sala salva, reentra direto
+  const saved=localStorage.getItem('gl_room');
+  if(saved && saved!=='couple'){
+    setRoomCode(saved);
+    roomEnter();
+    return;
+  }
+  roomShow('roomHome');
+}
+
+let _pendingCode=null;
+async function roomCreate(){
+  if(!sb){ document.getElementById('roomErr').textContent='Sem conexão 🌹'; return; }
+  const code=String(Math.floor(100000+Math.random()*900000));
+  const {error}=await sb.from('room').insert({code,scene:'jardim'});
+  if(error){ document.getElementById('roomErr').textContent='Erro ao criar 🌹'; return; }
+  _pendingCode=code;
+  document.getElementById('roomCodeShow').textContent=code;
+  roomShow('roomCreated');
+}
+function roomCopy(){
+  const c=document.getElementById('roomCodeShow').textContent;
+  if(navigator.clipboard) navigator.clipboard.writeText(c);
+  showToast('Código copiado 💕');
+}
+async function roomJoinGo(){
+  const v=(document.getElementById('roomCodeIn').value||'').trim();
+  if(!/^\d{6}$/.test(v)){ document.getElementById('roomErr3').textContent='Use 6 dígitos 🌹'; return; }
+  if(!sb){ document.getElementById('roomErr3').textContent='Sem conexão 🌹'; return; }
+  const {data}=await sb.from('room').select('code').eq('code',v).maybeSingle();
+  if(!data){ document.getElementById('roomErr3').textContent='Sala não encontrada 🌹'; return; }
+  _pendingCode=v; roomEnter();
+}
+function roomEnter(){
+  const c = _pendingCode || localStorage.getItem('gl_room');
+  if(!c){ roomShow('roomHome'); return; }
+  setRoomCode(c);
+  roomHide();
+  // HUD
+  const h=document.getElementById('hudRoom'); if(h) h.textContent='sala '+c;
+  // inicia subscriptions de room
+  roomSubscribe();
+  // re-restaurar roles do jardim/memória dentro da sala
+  const r1=localStorage.getItem('gl_g2_role'); if(r1==='aquiles'||r1==='giovana') g2SetRole(r1);
+  const r2=localStorage.getItem('gl_role');    if(r2==='aquiles'||r2==='giovana') memSetRole(r2);
+  showToast('Entrou na sala '+c+' 💕');
+}
+function roomLeave(){
+  if(!confirm('Sair da sala?')) return;
+  clearRoomCode();
+  localStorage.removeItem('gl_g2_role');
+  localStorage.removeItem('gl_role');
+  location.reload();
+}
+
+// ---------- ESTADO DA SALA (room) ----------
+let roomState=null, roomSubed=false;
+async function roomSubscribe(){
+  if(!sb||roomSubed) return;
+  roomSubed=true;
+  // carrega estado inicial
+  const {data}=await sb.from('room').select('*').eq('code',RID()).maybeSingle();
+  if(data) roomApply(data);
+  sb.channel('room-'+RID())
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'room',filter:'code=eq.'+RID()},(p)=>roomApply(p.new))
+    .subscribe();
+}
+function roomApply(s){
+  roomState=s;
+  // HUD saldos
+  const hg=document.getElementById('hudCoinsG'); if(hg) hg.textContent='💗 '+(s.coins_g||0);
+  const hm=document.getElementById('hudMoneyA'); if(hm) hm.textContent='💵 R$ '+Number(s.money_a||0).toFixed(2).replace('.',',');
+  // botão poder visível só pra Giovana se ela tem alguma forma comprada
+  const inv_g = s.inv_g||{};
+  const btnP=document.getElementById('btnPower');
+  if(btnP) btnP.style.display = (g2Role==='giovana' && (inv_g.bebe||inv_g.beicinho)) ? 'inline-block':'none';
+  // botão Trabalho só pro Aquiles
+  const btT=document.getElementById('sceneTrabalhoBtn');
+  if(btT) btT.style.display = (g2Role==='aquiles' || s.scene==='trabalho') ? '' : 'none';
+  // marcar cenário ativo
+  document.querySelectorAll('#g2Scenes button').forEach(b=>{
+    b.classList.toggle('on', b.getAttribute('data-scene')===s.scene);
+  });
+  // botão entregar visível pro Aquiles se tem item no inventário
+  const inv_a=s.inv_a||{};
+  const total=Object.values(inv_a).reduce((a,b)=>a+(Number(b)||0),0);
+  const btnD=document.getElementById('btnDeliver');
+  if(btnD) btnD.style.display = (g2Role==='aquiles' && total>0) ? 'inline-block':'none';
+  // animação de ações efêmeras
+  const acts=Array.isArray(s.actions)?s.actions:[];
+  if(acts.length){
+    const last=acts[acts.length-1];
+    if(last && last.t && last.t!==roomApply._lastAct){
+      roomApply._lastAct=last.t;
+      handleAction(last);
+    }
+  }
+}
+
+function handleAction(a){
+  if(a.kind==='kiss'){
+    g2ShowBubble('💋💕');
+    burstHearts();
+  } else if(a.kind==='deliver'){
+    g2ShowBubble(`Aquiles te deu ${a.label} 💕`);
+  } else if(a.kind==='power'){
+    g2ShowBubble(a.on?`Giovana virou ${a.label} ✨`:`Giovana voltou ao normal`);
+  }
+}
+
+function burstHearts(){
+  // efeito visual rápido: floods em pétalas
+  for(let i=0;i<14;i++){
+    setTimeout(()=>{ const p=document.createElement('div');p.className='petal';p.textContent='💗';p.style.cssText=`left:${30+Math.random()*40}vw;font-size:${16+Math.random()*16}px;animation-duration:${4+Math.random()*3}s;`;document.getElementById('pw').appendChild(p);setTimeout(()=>p.remove(),9000);}, i*30);
+  }
+}
+
+async function roomPatch(patch){
+  if(!sb||!roomState) return;
+  await sb.from('room').update({...patch, updated_at:new Date().toISOString()}).eq('code',RID());
+}
+async function pushAction(a){
+  if(!roomState) return;
+  const acts = Array.isArray(roomState.actions)?[...roomState.actions]:[];
+  acts.push({...a, t:Date.now()});
+  await roomPatch({actions: acts.slice(-10)});
+}
+
+// ---------- CENÁRIOS ----------
+async function sceneSet(s){
+  if(!roomState) return;
+  if(s==='trabalho' && g2Role!=='aquiles'){ showToast('Só o Aquiles pode ir trabalhar 💼'); return; }
+  // reset de posições para entrada do cenário
+  const start = SCENE_STARTS[s] || SCENE_STARTS.jardim;
+  await roomPatch({scene:s});
+  if(sb){
+    await sb.from('game_session').update({
+      ax:start.a.x,ay:start.a.y,gx:start.g.x,gy:start.g.y,
+      updated_at:new Date().toISOString()
+    }).eq('id',RID());
+  }
+  // força reposicionamento local
+  g2Local.x = (g2Role==='aquiles'?start.a.x:start.g.x);
+  g2Local.y = (g2Role==='aquiles'?start.a.y:start.g.y);
+  g2Local._init=true;
+}
+const SCENE_STARTS={
+  jardim:   {a:{x:120,y:360}, g:{x:760,y:360}},
+  praia:    {a:{x:160,y:380}, g:{x:720,y:380}},
+  cinema:   {a:{x:300,y:380}, g:{x:560,y:380}},
+  zoo:      {a:{x:140,y:380}, g:{x:740,y:380}},
+  trabalho: {a:{x:200,y:380}, g:{x:680,y:380}}
+};
+
+// Hook no render: desenha o cenário ATUAL antes dos personagens.
+// Patch leve: encapsula o g2Render original.
+const _g2RenderOrig = g2Render;
+window.g2Render = function(){
+  // chama original
+  _g2RenderOrig();
+  // depois desenha overlay do cenário (PC, sol, telão, jaulas) + corações da economia
+  const c=document.getElementById('g2Canvas'); if(!c||!roomState) return;
+  const ctx=c.getContext('2d');
+  drawSceneOverlay(ctx, roomState.scene||'jardim');
+  // corações de economia (flutuando) — só nos cenários ≠ trabalho
+  const econ = Array.isArray(roomState.heartsE)?roomState.heartsE:[];
+  if((roomState.scene||'jardim')!=='trabalho'){
+    econ.forEach(h=>{
+      const bob=Math.sin(g2Anim*4+h.id)*3;
+      ctx.save(); ctx.shadowColor='#ff6b9d'; ctx.shadowBlur=12;
+      ctx.font='24px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('💗',h.x,h.y+bob);
+      ctx.restore();
+    });
+  }
+};
+// re-aliasar para o loop usar a versão nova
+g2Render = window.g2Render;
+
+function drawSceneOverlay(ctx, scene){
+  const W=880,H=495;
+  if(scene==='praia'){
+    // céu com gradiente sobre o canvas (semi-transparente)
+    const sk=ctx.createLinearGradient(0,0,0,H*0.55);
+    sk.addColorStop(0,'rgba(255,200,140,0.55)'); sk.addColorStop(1,'rgba(120,180,220,0.25)');
+    ctx.fillStyle=sk; ctx.fillRect(0,0,W,H*0.55);
+    // mar
+    ctx.fillStyle='rgba(40,110,160,0.55)'; ctx.fillRect(0,H*0.4,W,H*0.2);
+    // areia
+    ctx.fillStyle='rgba(240,210,150,0.7)'; ctx.fillRect(0,H*0.6,W,H*0.4);
+    // sol
+    ctx.save(); ctx.shadowColor='#ffd17a'; ctx.shadowBlur=30;
+    ctx.fillStyle='#ffe48a'; ctx.beginPath(); ctx.arc(W-100,90,42,0,Math.PI*2); ctx.fill(); ctx.restore();
+    // guarda-sol
+    ctx.fillStyle='#c4506e'; ctx.beginPath(); ctx.moveTo(120,310); ctx.lineTo(60,260); ctx.lineTo(180,260); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#3a2418'; ctx.fillRect(118,310,4,80);
+  } else if(scene==='cinema'){
+    ctx.fillStyle='rgba(6,3,8,0.85)'; ctx.fillRect(0,0,W,H);
+    // telão
+    ctx.fillStyle='#f7e9b2'; ctx.fillRect(140,40,600,180);
+    ctx.strokeStyle='#d4af37'; ctx.lineWidth=4; ctx.strokeRect(140,40,600,180);
+    ctx.fillStyle='#1a1a2e'; ctx.font='24px Georgia,serif'; ctx.textAlign='center';
+    ctx.fillText('🎬 nosso filme favorito 🎬',W/2,140);
+    // poltronas
+    ctx.fillStyle='#5a1a30';
+    for(let i=0;i<6;i++){ ctx.fillRect(80+i*130,400,90,40); ctx.fillRect(80+i*130,360,90,40); }
+  } else if(scene==='zoo'){
+    ctx.fillStyle='rgba(80,140,80,0.4)'; ctx.fillRect(0,0,W,H);
+    // jaulas estilizadas
+    [[140,140,'🦁'],[440,140,'🐘'],[740,140,'🦒']].forEach(([x,y,e])=>{
+      ctx.fillStyle='rgba(60,40,30,0.7)'; ctx.fillRect(x-60,y-50,120,90);
+      ctx.strokeStyle='#888'; ctx.lineWidth=2;
+      for(let i=0;i<6;i++){ ctx.beginPath(); ctx.moveTo(x-50+i*20,y-50); ctx.lineTo(x-50+i*20,y+40); ctx.stroke(); }
+      ctx.font='40px serif'; ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.fillText(e,x,y+10);
+    });
+  } else if(scene==='trabalho'){
+    ctx.fillStyle='rgba(20,20,30,0.8)'; ctx.fillRect(0,0,W,H);
+    // mesa
+    ctx.fillStyle='#3a2818'; ctx.fillRect(330,250,220,120);
+    // PC (área "trabalho")
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(380,180,120,90);
+    ctx.fillStyle='#3aa0ff'; ctx.fillRect(388,188,104,70);
+    ctx.fillStyle='#fff'; ctx.font='10px monospace'; ctx.textAlign='left';
+    ctx.fillText('> Aquiles@work',392,202);
+    ctx.fillText('> ganhando R$ 0,40/s',392,216);
+    ctx.fillStyle='#888'; ctx.fillRect(420,270,40,8); ctx.fillRect(410,278,60,4);
+    // marcador da zona de trabalho
+    ctx.strokeStyle='rgba(240,216,112,0.4)'; ctx.setLineDash([6,4]);
+    ctx.strokeRect(WORK_ZONE.x,WORK_ZONE.y,WORK_ZONE.w,WORK_ZONE.h); ctx.setLineDash([]);
+  }
+  // (jardim usa o desenho original)
+}
+const WORK_ZONE={x:340,y:240,w:200,h:140};
+
+// ---------- ECONOMIA: corações Giovana + dinheiro Aquiles ----------
+let _econHeartTimer=null, _moneyTimer=null, _econLast=0;
+function startEconomyLoops(){
+  // host = aquiles (decide spawn de corações pra evitar duplicação)
+  if(_econHeartTimer) clearInterval(_econHeartTimer);
+  _econHeartTimer = setInterval(spawnHeartIfHost, 3000);
+  if(_moneyTimer) clearInterval(_moneyTimer);
+  _moneyTimer = setInterval(tickMoney, 1000);
+  setInterval(checkPickupHearts, 200);
+}
+async function spawnHeartIfHost(){
+  if(!roomState||g2Role!=='aquiles')return;
+  const scene=roomState.scene||'jardim'; if(scene==='trabalho')return;
+  const list=Array.isArray(roomState.heartsE)?roomState.heartsE:[];
+  if(list.length>=12) return;
+  const nh={id:Date.now()%100000, x:60+Math.random()*760, y:60+Math.random()*380};
+  await roomPatch({heartsE:[...list,nh]});
+}
+async function checkPickupHearts(){
+  if(!roomState||g2Role!=='giovana')return;
+  const list=Array.isArray(roomState.heartsE)?roomState.heartsE:[];
+  if(!list.length)return;
+  const myx=g2Local.x, myy=g2Local.y;
+  const got=[]; const left=[];
+  list.forEach(h=>{
+    if(Math.hypot(h.x-myx,h.y-myy)<28) got.push(h); else left.push(h);
+  });
+  if(got.length){
+    await roomPatch({heartsE:left, coins_g:(roomState.coins_g||0)+got.length});
+    showToast('💗 +'+got.length);
+  }
+}
+async function tickMoney(){
+  if(!roomState||g2Role!=='aquiles')return;
+  if((roomState.scene||'jardim')!=='trabalho')return;
+  // Aquiles precisa estar na zona de trabalho
+  const cx=g2Local.x, cy=g2Local.y;
+  const inZone = cx>WORK_ZONE.x && cx<WORK_ZONE.x+WORK_ZONE.w && cy>WORK_ZONE.y && cy<WORK_ZONE.y+WORK_ZONE.h;
+  if(!inZone) return;
+  const m=Number(roomState.money_a||0)+0.40;
+  await roomPatch({money_a:m});
+}
+
+// ---------- LOJA ----------
+const SHOP_A=[ // Aquiles compra com dinheiro pra Giovana
+  {key:'flor', emo:'🌹', nm:'Flor', pr:5, label:'uma flor 🌹'},
+  {key:'choco', emo:'🍫', nm:'Chocolate', pr:8, label:'um chocolate 🍫'},
+  {key:'nescau', emo:'🥛', nm:'NescauBoll', pr:6, label:'um NescauBoll 🥛'},
+  {key:'japa', emo:'🍣', nm:'Comida japonesa', pr:20, label:'comida japonesa 🍣'},
+  {key:'urso', emo:'🧸', nm:'Ursinho', pr:12, label:'um ursinho 🧸'},
+  {key:'anel', emo:'💍', nm:'Anel', pr:50, label:'um anel 💍'}
+];
+const SHOP_G=[ // Giovana compra com 💗
+  {key:'bebe', emo:'👶', nm:'Forma Bebezinha', pr:30, label:'Bebezinha', power:true},
+  {key:'beicinho', emo:'🥺', nm:'Forma Beicinho', pr:30, label:'Beicinho', power:true},
+  {key:'coroa', emo:'👑', nm:'Coroa extra', pr:15, label:'Coroa'},
+  {key:'lacinho', emo:'🎀', nm:'Lacinho', pr:15, label:'Lacinho'},
+  {key:'brilho', emo:'✨', nm:'Brilho', pr:25, label:'Brilho'}
+];
+let shopCur='a';
+function shopOpen(){
+  if(!roomState){ showToast('Entre numa sala primeiro 🌹'); return; }
+  document.getElementById('shop').classList.add('on');
+  // se Giovana, abre na aba dela
+  shopCur = (g2Role==='giovana')?'g':'a';
+  shopTab(shopCur);
+}
+function shopClose(){ document.getElementById('shop').classList.remove('on'); }
+function shopTab(t){
+  shopCur=t;
+  document.getElementById('shopTabA').classList.toggle('on',t==='a');
+  document.getElementById('shopTabG').classList.toggle('on',t==='g');
+  shopRender();
+}
+function shopRender(){
+  const body=document.getElementById('shopBody');
+  const inv_a=roomState.inv_a||{}, inv_g=roomState.inv_g||{};
+  const bal=document.getElementById('shopBalance');
+  if(shopCur==='a'){
+    bal.textContent = `Aquiles: 💵 R$ ${Number(roomState.money_a||0).toFixed(2).replace('.',',')}  •  itens no inventário: ${Object.values(inv_a).reduce((a,b)=>a+(Number(b)||0),0)}`;
+    let html='<div class="shop-section-title">Compre pra Giovana — entrega encostando nela</div><div class="shop-grid">';
+    SHOP_A.forEach(it=>{
+      const own=inv_a[it.key]||0;
+      const can = g2Role==='aquiles' && Number(roomState.money_a||0)>=it.pr;
+      html+=`<div class="shop-item"><div class="emo">${it.emo}</div><div class="nm">${it.nm}</div><div class="pr">R$ ${it.pr.toFixed(2).replace('.',',')}</div>${own?`<div class="own">no inventário: ${own}</div>`:''}<button onclick="shopBuyA('${it.key}')" ${can?'':'disabled'}>${g2Role==='aquiles'?'Comprar':'só Aquiles'}</button></div>`;
+    });
+    body.innerHTML=html+'</div>';
+  } else {
+    bal.textContent = `Giovana: 💗 ${roomState.coins_g||0}  •  forma ativa: ${roomState.form_g||'nenhuma'}`;
+    let html='<div class="shop-section-title">Itens especiais — pague com 💗</div><div class="shop-grid">';
+    SHOP_G.forEach(it=>{
+      const own=inv_g[it.key]||0;
+      const can = g2Role==='giovana' && (roomState.coins_g||0)>=it.pr && !own;
+      html+=`<div class="shop-item"><div class="emo">${it.emo}</div><div class="nm">${it.nm}</div><div class="pr">${it.pr} 💗</div>${own?`<div class="own">já comprado ✓</div>`:''}<button onclick="shopBuyG('${it.key}')" ${can?'':'disabled'}>${g2Role==='giovana'?(own?'já tem':'Comprar'):'só Giovana'}</button></div>`;
+    });
+    body.innerHTML=html+'</div>';
+  }
+}
+async function shopBuyA(key){
+  const it=SHOP_A.find(x=>x.key===key); if(!it)return;
+  if(g2Role!=='aquiles')return;
+  if(Number(roomState.money_a||0)<it.pr) return;
+  const inv={...(roomState.inv_a||{})}; inv[key]=(inv[key]||0)+1;
+  await roomPatch({money_a:Number(roomState.money_a||0)-it.pr, inv_a:inv});
+  showToast('Comprado: '+it.nm);
+  shopRender();
+}
+async function shopBuyG(key){
+  const it=SHOP_G.find(x=>x.key===key); if(!it)return;
+  if(g2Role!=='giovana')return;
+  if((roomState.coins_g||0)<it.pr) return;
+  const inv={...(roomState.inv_g||{})}; if(inv[key]) return;
+  inv[key]=1;
+  await roomPatch({coins_g:(roomState.coins_g||0)-it.pr, inv_g:inv});
+  showToast('Comprado: '+it.nm);
+  shopRender();
+}
+
+// ---------- AÇÕES (beijo, entrega, poder) ----------
+async function actKiss(){
+  if(!roomState) return;
+  // precisa estar perto do outro
+  const ox = (g2Role==='aquiles')?g2Remote.x:g2Local.x;
+  const oy = (g2Role==='aquiles')?g2Remote.y:g2Local.y;
+  const ax = (g2Role==='aquiles')?g2Local.x:g2Remote.x;
+  const ay = (g2Role==='aquiles')?g2Local.y:g2Remote.y;
+  if(Math.hypot(ax-ox,ay-oy)>60){ showToast('Chega mais perto pra beijar 💕'); return; }
+  await pushAction({kind:'kiss'});
+}
+async function actDeliver(){
+  if(!roomState||g2Role!=='aquiles') return;
+  const inv={...(roomState.inv_a||{})};
+  const keys=Object.keys(inv).filter(k=>inv[k]>0);
+  if(!keys.length){ showToast('Nada pra entregar 🌹'); return; }
+  // próximo da Giovana?
+  if(Math.hypot(g2Local.x-g2Remote.x, g2Local.y-g2Remote.y)>60){
+    showToast('Encosta na Giovana pra entregar 💕'); return;
+  }
+  // entrega o primeiro item disponível
+  const k=keys[0]; inv[k]--;
+  const inv_g={...(roomState.inv_g||{})}; inv_g[k]=(inv_g[k]||0)+1;
+  const it=SHOP_A.find(x=>x.key===k);
+  await roomPatch({inv_a:inv, inv_g:inv_g});
+  await pushAction({kind:'deliver', label:it?it.label:k});
+  showToast('Entregou '+(it?it.nm:k)+' 💕');
+}
+async function actPower(){
+  if(!roomState||g2Role!=='giovana') return;
+  const inv=roomState.inv_g||{};
+  // alterna entre formas que ela tem
+  const forms=['bebe','beicinho'].filter(f=>inv[f]);
+  if(!forms.length) return;
+  const cur=roomState.form_g;
+  let next;
+  if(!cur) next=forms[0];
+  else {
+    const i=forms.indexOf(cur);
+    next = (i<0||i===forms.length-1) ? null : forms[i+1];
+  }
+  await roomPatch({form_g:next});
+  const lbl = next==='bebe'?'Bebezinha':next==='beicinho'?'Beicinho':null;
+  await pushAction({kind:'power', on:!!next, label:lbl});
+}
+
+// inicia loops de economia logo após carregar
+startEconomyLoops();
+
+// expõe pro escopo global (onclick do HTML inline)
+window.roomCreate=roomCreate; window.roomShowJoin=roomShowJoin; window.roomBack=roomBack;
+window.roomCopy=roomCopy; window.roomEnter=roomEnter; window.roomJoinGo=roomJoinGo; window.roomLeave=roomLeave;
+window.sceneSet=sceneSet; window.shopOpen=shopOpen; window.shopClose=shopClose; window.shopTab=shopTab;
+window.shopBuyA=shopBuyA; window.shopBuyG=shopBuyG; window.actKiss=actKiss; window.actDeliver=actDeliver; window.actPower=actPower;
+
 // REVEAL
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:0.08});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
