@@ -1308,14 +1308,16 @@ function roomShowJoin(){ roomShow('roomJoin'); setTimeout(()=>document.getElemen
 function roomBack(){ roomShow('roomHome'); }
 
 function roomBoot(){
-  // se já tinha sala salva, reentra direto
+  // tela de sala não é mais overlay fullscreen — fica dentro das seções de jogo.
+  // se já tinha sala salva, reentra direto (sem mostrar overlay).
   const saved=localStorage.getItem('gl_room');
   if(saved && saved!=='couple'){
+    _pendingCode=saved;
     setRoomCode(saved);
     roomEnter();
-    return;
+  } else {
+    renderRoomGate();
   }
-  roomShow('roomHome');
 }
 
 let _pendingCode=null;
