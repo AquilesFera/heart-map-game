@@ -797,8 +797,14 @@ function memSetRole(role){
   }
 }
 async function memLoad(){
-  const {data}=await sb.from('mem_session').select('*').eq('id',RID()).single();
-  if(data)memApply(data);
+  let {data}=await sb.from('mem_session').select('*').eq('id',RID()).maybeSingle();
+  if(!data){
+    const seed=Math.floor(Math.random()*1000000);
+    await sb.from('mem_session').insert({id:RID(),room_code:RID(),seed,flipped:[],matched:[],turn:'aquiles',score_a:0,score_g:0});
+    const r=await sb.from('mem_session').select('*').eq('id',RID()).maybeSingle();
+    data=r.data;
+  }
+  if(data) memApply(data);
 }
 function memApply(s){
   memState=s;memBoard=memShuffle(Number(s.seed));
