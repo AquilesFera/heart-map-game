@@ -290,6 +290,7 @@ footer{background:var(--bk);text-align:center;padding:80px 20px 60px;border-top:
     <div class="room-actions">
       <button class="room-btn" onclick="roomCreate()">✨ Criar sala</button>
       <button class="room-btn ghost" onclick="roomShowJoin()">🔑 Entrar com código</button>
+      <button class="room-btn ghost" onclick="roomCloseOverlay()">✕ Fechar</button>
     </div>
     <p class="room-err" id="roomErr"></p>
   </div>
@@ -479,7 +480,17 @@ Eu fiz hm.</p>
 
 <section id="aventura">
   <div class="st rv"><div class="sl"></div><h2>Jardim do Nosso Amor</h2><p>caminhem juntos e juntem todos os corações 💕</p><div class="sl"></div></div>
-  <div class="vn-box rv">
+  <div class="vn-box rv" id="g2RoomGate" style="display:none">
+    <div style="text-align:center;padding:24px 16px">
+      <div style="font-size:42px;margin-bottom:8px">🔑</div>
+      <h3 style="font-weight:300;letter-spacing:1px;margin-bottom:6px">Entre numa sala pra jogar junto</h3>
+      <p style="color:var(--pink);font-style:italic;font-size:13px;margin-bottom:18px;opacity:.9">crie uma sala e mande o código pra ela 🌹</p>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto">
+        <button class="room-btn" onclick="roomOpen()">✨ Criar / Entrar em sala</button>
+      </div>
+    </div>
+  </div>
+  <div class="vn-box rv" id="g2GameWrap">
     <div class="vn-pick" id="g2Pick">
       <p>Quem está jogando agora?</p>
       <div class="vn-pick-btns">
@@ -541,6 +552,14 @@ Eu fiz hm.</p>
 
 <section id="memoria">
   <div class="st rv"><div class="sl"></div><h2>Jogo da Memória</h2><p>ache todos os nossos momentos 🃏</p><div class="sl"></div></div>
+  <div class="rv" id="memRoomGate" style="display:none;text-align:center;padding:24px 16px">
+    <div style="font-size:42px;margin-bottom:8px">🔑</div>
+    <h3 style="font-weight:300;letter-spacing:1px;margin-bottom:6px">Entre numa sala pra jogar junto</h3>
+    <p style="color:var(--pink);font-style:italic;font-size:13px;margin-bottom:18px;opacity:.9">use o mesmo código pros dois jogos 🃏</p>
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto">
+      <button class="room-btn" onclick="roomOpen()">✨ Criar / Entrar em sala</button>
+    </div>
+  </div>
   <div class="mem-pick" id="memPick">
     <p>Quem está jogando agora?</p>
     <div class="vn-pick-btns">
@@ -1149,47 +1168,53 @@ async function g2CheckHearts(){
 function g2Render(){
   const c=g2El('g2Canvas'); if(!c)return;
   const ctx=c.getContext('2d');
-  // fundo gramado com gradiente
-  const g=ctx.createRadialGradient(G2_W/2,G2_H/2,80,G2_W/2,G2_H/2,600);
-  g.addColorStop(0,'#1d4a2a'); g.addColorStop(1,'#0a2412');
-  ctx.fillStyle=g; ctx.fillRect(0,0,G2_W,G2_H);
-  // textura pontinhos
-  ctx.fillStyle='rgba(255,255,255,0.025)';
-  for(let i=0;i<60;i++){
-    const px=(i*137.5)%G2_W, py=((i*89.7)%G2_H);
-    ctx.fillRect(px,py,2,2);
+  const _scene = (typeof roomState!=='undefined' && roomState && roomState.scene) ? roomState.scene : 'jardim';
+  if(_scene === 'jardim'){
+    // fundo gramado com gradiente
+    const g=ctx.createRadialGradient(G2_W/2,G2_H/2,80,G2_W/2,G2_H/2,600);
+    g.addColorStop(0,'#1d4a2a'); g.addColorStop(1,'#0a2412');
+    ctx.fillStyle=g; ctx.fillRect(0,0,G2_W,G2_H);
+    // textura pontinhos
+    ctx.fillStyle='rgba(255,255,255,0.025)';
+    for(let i=0;i<60;i++){
+      const px=(i*137.5)%G2_W, py=((i*89.7)%G2_H);
+      ctx.fillRect(px,py,2,2);
+    }
+    // caminhos de pedra
+    ctx.fillStyle='rgba(232,200,160,0.18)';
+    G2_DECOR.path.forEach(p=>{
+      ctx.beginPath();
+      if(ctx.roundRect)ctx.roundRect(p.x,p.y,p.w,p.h,12); else ctx.rect(p.x,p.y,p.w,p.h);
+      ctx.fill();
+    });
+    // laguinho
+    const p=G2_DECOR.pond;
+    const pg=ctx.createRadialGradient(p.x,p.y,4,p.x,p.y,p.rx);
+    pg.addColorStop(0,'rgba(120,180,220,0.8)'); pg.addColorStop(1,'rgba(40,70,100,0.6)');
+    ctx.fillStyle=pg;
+    ctx.beginPath(); ctx.ellipse(p.x,p.y,p.rx,p.ry,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(212,175,55,0.3)'; ctx.lineWidth=2; ctx.stroke();
+    // árvore
+    const t=G2_DECOR.tree;
+    ctx.fillStyle='#5a3820'; ctx.fillRect(t.x-8,t.y+t.r-10,16,32);
+    ctx.fillStyle='#1f6634';
+    ctx.beginPath(); ctx.arc(t.x-22,t.y,t.r-10,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(t.x+22,t.y-8,t.r-12,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(t.x,t.y-18,t.r-6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#2a8a48';
+    ctx.beginPath(); ctx.arc(t.x-10,t.y+4,t.r-18,0,Math.PI*2); ctx.fill();
+    // banco
+    const b=G2_DECOR.bench;
+    ctx.fillStyle='#3a2818'; ctx.fillRect(b.x,b.y,b.w,8);
+    ctx.fillRect(b.x+10,b.y+8,8,18); ctx.fillRect(b.x+b.w-18,b.y+8,8,18);
+    ctx.fillStyle='rgba(58,40,24,0.6)'; ctx.fillRect(b.x,b.y-14,b.w,6);
+    // flores decorativas
+    ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    G2_DECOR.flowers.forEach(f=>{ctx.fillText(f[2],f[0],f[1]);});
+  } else {
+    // fundo neutro pros outros cenários — o overlay desenha o resto
+    ctx.fillStyle='#0a0a14'; ctx.fillRect(0,0,G2_W,G2_H);
   }
-  // caminhos de pedra
-  ctx.fillStyle='rgba(232,200,160,0.18)';
-  G2_DECOR.path.forEach(p=>{
-    ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(p.x,p.y,p.w,p.h,12); else ctx.rect(p.x,p.y,p.w,p.h);
-    ctx.fill();
-  });
-  // laguinho
-  const p=G2_DECOR.pond;
-  const pg=ctx.createRadialGradient(p.x,p.y,4,p.x,p.y,p.rx);
-  pg.addColorStop(0,'rgba(120,180,220,0.8)'); pg.addColorStop(1,'rgba(40,70,100,0.6)');
-  ctx.fillStyle=pg;
-  ctx.beginPath(); ctx.ellipse(p.x,p.y,p.rx,p.ry,0,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='rgba(212,175,55,0.3)'; ctx.lineWidth=2; ctx.stroke();
-  // árvore
-  const t=G2_DECOR.tree;
-  ctx.fillStyle='#5a3820'; ctx.fillRect(t.x-8,t.y+t.r-10,16,32);
-  ctx.fillStyle='#1f6634';
-  ctx.beginPath(); ctx.arc(t.x-22,t.y,t.r-10,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(t.x+22,t.y-8,t.r-12,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(t.x,t.y-18,t.r-6,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#2a8a48';
-  ctx.beginPath(); ctx.arc(t.x-10,t.y+4,t.r-18,0,Math.PI*2); ctx.fill();
-  // banco
-  const b=G2_DECOR.bench;
-  ctx.fillStyle='#3a2818'; ctx.fillRect(b.x,b.y,b.w,8);
-  ctx.fillRect(b.x+10,b.y+8,8,18); ctx.fillRect(b.x+b.w-18,b.y+8,8,18);
-  ctx.fillStyle='rgba(58,40,24,0.6)'; ctx.fillRect(b.x,b.y-14,b.w,6);
-  // flores decorativas
-  ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  G2_DECOR.flowers.forEach(f=>{ctx.fillText(f[2],f[0],f[1]);});
   // corações
   if(g2State){
     const hearts=Array.isArray(g2State.hearts)?g2State.hearts:[];
@@ -1307,15 +1332,34 @@ function roomHide(){
 function roomShowJoin(){ roomShow('roomJoin'); setTimeout(()=>document.getElementById('roomCodeIn').focus(),100); }
 function roomBack(){ roomShow('roomHome'); }
 
+// Mostra/esconde os "gates de sala" inline dentro das seções de jogo
+function renderRoomGate(){
+  const inRoom = !!localStorage.getItem('gl_room') && localStorage.getItem('gl_room')!=='couple';
+  const g2Gate=document.getElementById('g2RoomGate');
+  const g2Wrap=document.getElementById('g2GameWrap');
+  const memGate=document.getElementById('memRoomGate');
+  const memWrap=document.getElementById('memGameWrap');
+  if(g2Gate) g2Gate.style.display = inRoom?'none':'';
+  if(g2Wrap) g2Wrap.style.display = inRoom?'':'none';
+  if(memGate) memGate.style.display = inRoom?'none':'';
+  if(memWrap) memWrap.style.display = inRoom?'':'none';
+}
+
+// Abre o overlay de sala (a partir dos botões inline)
+function roomOpen(){ roomShow('roomHome'); }
+function roomCloseOverlay(){ roomHide(); }
+
 function roomBoot(){
-  // se já tinha sala salva, reentra direto
+  // tela de sala não é mais overlay fullscreen — fica dentro das seções de jogo.
+  // se já tinha sala salva, reentra direto (sem mostrar overlay).
   const saved=localStorage.getItem('gl_room');
   if(saved && saved!=='couple'){
+    _pendingCode=saved;
     setRoomCode(saved);
     roomEnter();
-    return;
+  } else {
+    renderRoomGate();
   }
-  roomShow('roomHome');
 }
 
 let _pendingCode=null;
@@ -1353,6 +1397,7 @@ function roomEnter(){
   // re-restaurar roles do jardim/memória dentro da sala
   const r1=localStorage.getItem('gl_g2_role'); if(r1==='aquiles'||r1==='giovana') g2SetRole(r1);
   const r2=localStorage.getItem('gl_role');    if(r2==='aquiles'||r2==='giovana') memSetRole(r2);
+  renderRoomGate();
   showToast('Entrou na sala '+c+' 💕');
 }
 function roomLeave(){
@@ -1376,6 +1421,7 @@ async function roomSubscribe(){
     .subscribe();
 }
 function roomApply(s){
+  const prevScene = roomState ? roomState.scene : null;
   roomState=s;
   // HUD saldos
   const hg=document.getElementById('hudCoinsG'); if(hg) hg.textContent='💗 '+(s.coins_g||0);
@@ -1396,6 +1442,17 @@ function roomApply(s){
   const total=Object.values(inv_a).reduce((a,b)=>a+(Number(b)||0),0);
   const btnD=document.getElementById('btnDeliver');
   if(btnD) btnD.style.display = (g2Role==='aquiles' && total>0) ? 'inline-block':'none';
+  // ----- Sincroniza troca de cenário entre os dois jogadores -----
+  if(prevScene && s.scene && prevScene !== s.scene){
+    const start = (typeof SCENE_STARTS!=='undefined' && SCENE_STARTS[s.scene]) ? SCENE_STARTS[s.scene] : null;
+    if(start && g2Role){
+      const my = (g2Role==='aquiles') ? start.a : start.g;
+      const ot = (g2Role==='aquiles') ? start.g : start.a;
+      g2Local.x = my.x; g2Local.y = my.y; g2Local.dir='down'; g2Local.mov=false; g2Local._init=true;
+      g2Remote.x = ot.x; g2Remote.y = ot.y; g2Remote.dir='down'; g2Remote.mov=false;
+    }
+    showToast('Cenário: '+s.scene+' ✨');
+  }
   // animação de ações efêmeras
   const acts=Array.isArray(s.actions)?s.actions:[];
   if(acts.length){
@@ -1466,12 +1523,15 @@ const SCENE_STARTS={
 // Patch leve: encapsula o g2Render original.
 const _g2RenderOrig = g2Render;
 window.g2Render = function(){
-  // chama original
+  // chama original (que pinta fundo neutro nos outros cenários e depois personagens/corações)
   _g2RenderOrig();
-  // depois desenha overlay do cenário (PC, sol, telão, jaulas) + corações da economia
   const c=document.getElementById('g2Canvas'); if(!c||!roomState) return;
   const ctx=c.getContext('2d');
+  // desenha o cenário ATRÁS dos personagens usando destination-over
+  ctx.save();
+  ctx.globalCompositeOperation='destination-over';
   drawSceneOverlay(ctx, roomState.scene||'jardim');
+  ctx.restore();
   // corações de economia (flutuando) — só nos cenários ≠ trabalho
   const econ = Array.isArray(roomState.hearts)?roomState.hearts:[];
   if((roomState.scene||'jardim')!=='trabalho'){
@@ -1490,14 +1550,14 @@ g2Render = window.g2Render;
 function drawSceneOverlay(ctx, scene){
   const W=880,H=495;
   if(scene==='praia'){
-    // céu com gradiente sobre o canvas (semi-transparente)
+    // céu
     const sk=ctx.createLinearGradient(0,0,0,H*0.55);
-    sk.addColorStop(0,'rgba(255,200,140,0.55)'); sk.addColorStop(1,'rgba(120,180,220,0.25)');
+    sk.addColorStop(0,'#ffc88c'); sk.addColorStop(1,'#78b4dc');
     ctx.fillStyle=sk; ctx.fillRect(0,0,W,H*0.55);
     // mar
-    ctx.fillStyle='rgba(40,110,160,0.55)'; ctx.fillRect(0,H*0.4,W,H*0.2);
+    ctx.fillStyle='#286ea0'; ctx.fillRect(0,H*0.4,W,H*0.2);
     // areia
-    ctx.fillStyle='rgba(240,210,150,0.7)'; ctx.fillRect(0,H*0.6,W,H*0.4);
+    ctx.fillStyle='#f0d296'; ctx.fillRect(0,H*0.6,W,H*0.4);
     // sol
     ctx.save(); ctx.shadowColor='#ffd17a'; ctx.shadowBlur=30;
     ctx.fillStyle='#ffe48a'; ctx.beginPath(); ctx.arc(W-100,90,42,0,Math.PI*2); ctx.fill(); ctx.restore();
@@ -1505,7 +1565,7 @@ function drawSceneOverlay(ctx, scene){
     ctx.fillStyle='#c4506e'; ctx.beginPath(); ctx.moveTo(120,310); ctx.lineTo(60,260); ctx.lineTo(180,260); ctx.closePath(); ctx.fill();
     ctx.fillStyle='#3a2418'; ctx.fillRect(118,310,4,80);
   } else if(scene==='cinema'){
-    ctx.fillStyle='rgba(6,3,8,0.85)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#06030a'; ctx.fillRect(0,0,W,H);
     // telão
     ctx.fillStyle='#f7e9b2'; ctx.fillRect(140,40,600,180);
     ctx.strokeStyle='#d4af37'; ctx.lineWidth=4; ctx.strokeRect(140,40,600,180);
@@ -1515,16 +1575,16 @@ function drawSceneOverlay(ctx, scene){
     ctx.fillStyle='#5a1a30';
     for(let i=0;i<6;i++){ ctx.fillRect(80+i*130,400,90,40); ctx.fillRect(80+i*130,360,90,40); }
   } else if(scene==='zoo'){
-    ctx.fillStyle='rgba(80,140,80,0.4)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#3a6a3a'; ctx.fillRect(0,0,W,H);
     // jaulas estilizadas
     [[140,140,'🦁'],[440,140,'🐘'],[740,140,'🦒']].forEach(([x,y,e])=>{
-      ctx.fillStyle='rgba(60,40,30,0.7)'; ctx.fillRect(x-60,y-50,120,90);
+      ctx.fillStyle='#3c281e'; ctx.fillRect(x-60,y-50,120,90);
       ctx.strokeStyle='#888'; ctx.lineWidth=2;
       for(let i=0;i<6;i++){ ctx.beginPath(); ctx.moveTo(x-50+i*20,y-50); ctx.lineTo(x-50+i*20,y+40); ctx.stroke(); }
       ctx.font='40px serif'; ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.fillText(e,x,y+10);
     });
   } else if(scene==='trabalho'){
-    ctx.fillStyle='rgba(20,20,30,0.8)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#14141e'; ctx.fillRect(0,0,W,H);
     // mesa
     ctx.fillStyle='#3a2818'; ctx.fillRect(330,250,220,120);
     // PC (área "trabalho")
@@ -1712,6 +1772,7 @@ startEconomyLoops();
 // expõe pro escopo global (onclick do HTML inline)
 window.roomCreate=roomCreate; window.roomShowJoin=roomShowJoin; window.roomBack=roomBack;
 window.roomCopy=roomCopy; window.roomEnter=roomEnter; window.roomJoinGo=roomJoinGo; window.roomLeave=roomLeave;
+window.roomOpen=roomOpen; window.roomCloseOverlay=roomCloseOverlay; window.renderRoomGate=renderRoomGate;
 window.sceneSet=sceneSet; window.shopOpen=shopOpen; window.shopClose=shopClose; window.shopTab=shopTab;
 window.shopBuyA=shopBuyA; window.shopBuyG=shopBuyG; window.actKiss=actKiss; window.actDeliver=actDeliver; window.actPower=actPower;
 
