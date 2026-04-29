@@ -1390,6 +1390,7 @@ function roomEnter(){
   // re-restaurar roles do jardim/memória dentro da sala
   const r1=localStorage.getItem('gl_g2_role'); if(r1==='aquiles'||r1==='giovana') g2SetRole(r1);
   const r2=localStorage.getItem('gl_role');    if(r2==='aquiles'||r2==='giovana') memSetRole(r2);
+  renderRoomGate();
   showToast('Entrou na sala '+c+' 💕');
 }
 function roomLeave(){
