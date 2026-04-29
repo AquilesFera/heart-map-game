@@ -1168,47 +1168,53 @@ async function g2CheckHearts(){
 function g2Render(){
   const c=g2El('g2Canvas'); if(!c)return;
   const ctx=c.getContext('2d');
-  // fundo gramado com gradiente
-  const g=ctx.createRadialGradient(G2_W/2,G2_H/2,80,G2_W/2,G2_H/2,600);
-  g.addColorStop(0,'#1d4a2a'); g.addColorStop(1,'#0a2412');
-  ctx.fillStyle=g; ctx.fillRect(0,0,G2_W,G2_H);
-  // textura pontinhos
-  ctx.fillStyle='rgba(255,255,255,0.025)';
-  for(let i=0;i<60;i++){
-    const px=(i*137.5)%G2_W, py=((i*89.7)%G2_H);
-    ctx.fillRect(px,py,2,2);
+  const _scene = (typeof roomState!=='undefined' && roomState && roomState.scene) ? roomState.scene : 'jardim';
+  if(_scene === 'jardim'){
+    // fundo gramado com gradiente
+    const g=ctx.createRadialGradient(G2_W/2,G2_H/2,80,G2_W/2,G2_H/2,600);
+    g.addColorStop(0,'#1d4a2a'); g.addColorStop(1,'#0a2412');
+    ctx.fillStyle=g; ctx.fillRect(0,0,G2_W,G2_H);
+    // textura pontinhos
+    ctx.fillStyle='rgba(255,255,255,0.025)';
+    for(let i=0;i<60;i++){
+      const px=(i*137.5)%G2_W, py=((i*89.7)%G2_H);
+      ctx.fillRect(px,py,2,2);
+    }
+    // caminhos de pedra
+    ctx.fillStyle='rgba(232,200,160,0.18)';
+    G2_DECOR.path.forEach(p=>{
+      ctx.beginPath();
+      if(ctx.roundRect)ctx.roundRect(p.x,p.y,p.w,p.h,12); else ctx.rect(p.x,p.y,p.w,p.h);
+      ctx.fill();
+    });
+    // laguinho
+    const p=G2_DECOR.pond;
+    const pg=ctx.createRadialGradient(p.x,p.y,4,p.x,p.y,p.rx);
+    pg.addColorStop(0,'rgba(120,180,220,0.8)'); pg.addColorStop(1,'rgba(40,70,100,0.6)');
+    ctx.fillStyle=pg;
+    ctx.beginPath(); ctx.ellipse(p.x,p.y,p.rx,p.ry,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(212,175,55,0.3)'; ctx.lineWidth=2; ctx.stroke();
+    // árvore
+    const t=G2_DECOR.tree;
+    ctx.fillStyle='#5a3820'; ctx.fillRect(t.x-8,t.y+t.r-10,16,32);
+    ctx.fillStyle='#1f6634';
+    ctx.beginPath(); ctx.arc(t.x-22,t.y,t.r-10,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(t.x+22,t.y-8,t.r-12,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(t.x,t.y-18,t.r-6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#2a8a48';
+    ctx.beginPath(); ctx.arc(t.x-10,t.y+4,t.r-18,0,Math.PI*2); ctx.fill();
+    // banco
+    const b=G2_DECOR.bench;
+    ctx.fillStyle='#3a2818'; ctx.fillRect(b.x,b.y,b.w,8);
+    ctx.fillRect(b.x+10,b.y+8,8,18); ctx.fillRect(b.x+b.w-18,b.y+8,8,18);
+    ctx.fillStyle='rgba(58,40,24,0.6)'; ctx.fillRect(b.x,b.y-14,b.w,6);
+    // flores decorativas
+    ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    G2_DECOR.flowers.forEach(f=>{ctx.fillText(f[2],f[0],f[1]);});
+  } else {
+    // fundo neutro pros outros cenários — o overlay desenha o resto
+    ctx.fillStyle='#0a0a14'; ctx.fillRect(0,0,G2_W,G2_H);
   }
-  // caminhos de pedra
-  ctx.fillStyle='rgba(232,200,160,0.18)';
-  G2_DECOR.path.forEach(p=>{
-    ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(p.x,p.y,p.w,p.h,12); else ctx.rect(p.x,p.y,p.w,p.h);
-    ctx.fill();
-  });
-  // laguinho
-  const p=G2_DECOR.pond;
-  const pg=ctx.createRadialGradient(p.x,p.y,4,p.x,p.y,p.rx);
-  pg.addColorStop(0,'rgba(120,180,220,0.8)'); pg.addColorStop(1,'rgba(40,70,100,0.6)');
-  ctx.fillStyle=pg;
-  ctx.beginPath(); ctx.ellipse(p.x,p.y,p.rx,p.ry,0,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='rgba(212,175,55,0.3)'; ctx.lineWidth=2; ctx.stroke();
-  // árvore
-  const t=G2_DECOR.tree;
-  ctx.fillStyle='#5a3820'; ctx.fillRect(t.x-8,t.y+t.r-10,16,32);
-  ctx.fillStyle='#1f6634';
-  ctx.beginPath(); ctx.arc(t.x-22,t.y,t.r-10,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(t.x+22,t.y-8,t.r-12,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(t.x,t.y-18,t.r-6,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#2a8a48';
-  ctx.beginPath(); ctx.arc(t.x-10,t.y+4,t.r-18,0,Math.PI*2); ctx.fill();
-  // banco
-  const b=G2_DECOR.bench;
-  ctx.fillStyle='#3a2818'; ctx.fillRect(b.x,b.y,b.w,8);
-  ctx.fillRect(b.x+10,b.y+8,8,18); ctx.fillRect(b.x+b.w-18,b.y+8,8,18);
-  ctx.fillStyle='rgba(58,40,24,0.6)'; ctx.fillRect(b.x,b.y-14,b.w,6);
-  // flores decorativas
-  ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  G2_DECOR.flowers.forEach(f=>{ctx.fillText(f[2],f[0],f[1]);});
   // corações
   if(g2State){
     const hearts=Array.isArray(g2State.hearts)?g2State.hearts:[];
