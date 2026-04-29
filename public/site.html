@@ -1473,7 +1473,7 @@ window.g2Render = function(){
   const ctx=c.getContext('2d');
   drawSceneOverlay(ctx, roomState.scene||'jardim');
   // corações de economia (flutuando) — só nos cenários ≠ trabalho
-  const econ = Array.isArray(roomState.heartsE)?roomState.heartsE:[];
+  const econ = Array.isArray(roomState.hearts)?roomState.hearts:[];
   if((roomState.scene||'jardim')!=='trabalho'){
     econ.forEach(h=>{
       const bob=Math.sin(g2Anim*4+h.id)*3;
@@ -1555,14 +1555,14 @@ function startEconomyLoops(){
 async function spawnHeartIfHost(){
   if(!roomState||g2Role!=='aquiles')return;
   const scene=roomState.scene||'jardim'; if(scene==='trabalho')return;
-  const list=Array.isArray(roomState.heartsE)?roomState.heartsE:[];
+  const list=Array.isArray(roomState.hearts)?roomState.hearts:[];
   if(list.length>=12) return;
   const nh={id:Date.now()%100000, x:60+Math.random()*760, y:60+Math.random()*380};
-  await roomPatch({heartsE:[...list,nh]});
+  await roomPatch({hearts:[...list,nh]});
 }
 async function checkPickupHearts(){
   if(!roomState||g2Role!=='giovana')return;
-  const list=Array.isArray(roomState.heartsE)?roomState.heartsE:[];
+  const list=Array.isArray(roomState.hearts)?roomState.hearts:[];
   if(!list.length)return;
   const myx=g2Local.x, myy=g2Local.y;
   const got=[]; const left=[];
@@ -1570,7 +1570,7 @@ async function checkPickupHearts(){
     if(Math.hypot(h.x-myx,h.y-myy)<28) got.push(h); else left.push(h);
   });
   if(got.length){
-    await roomPatch({heartsE:left, coins_g:(roomState.coins_g||0)+got.length});
+    await roomPatch({hearts:left, coins_g:(roomState.coins_g||0)+got.length});
     showToast('💗 +'+got.length);
   }
 }
