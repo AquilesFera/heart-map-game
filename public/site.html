@@ -875,8 +875,7 @@ async function initMemory(){
   const seed=Math.floor(Math.random()*1000000);
   await sb.from('mem_session').update({seed,flipped:[],matched:[],turn:'aquiles',score_a:0,score_g:0,updated_at:new Date().toISOString()}).eq('id','couple');
 }
-// auto-restore role
-(function(){const r=localStorage.getItem('gl_role');if(r==='aquiles'||r==='giovana'){memSetRole(r);} })();
+// (auto-restore de role ocorre depois que o usuário entra na sala — ver roomBoot)
 
 // === JOGO 2D ONLINE — Jardim do Nosso Amor ===
 const G2_W=880, G2_H=495;
@@ -1263,8 +1262,7 @@ function g2DrawChar(ctx,p,who){
   ctx.beginPath(); ctx.moveTo(x+10,cy+2); ctx.lineTo(x+14,cy+10-sw); ctx.stroke();
 }
 
-// auto-restore role
-(function(){const r=localStorage.getItem('gl_g2_role');if(r==='aquiles'||r==='giovana'){g2SetRole(r);} })();
+// (auto-restore de role ocorre depois que o usuário entra na sala — ver roomBoot)
 
 // REVEAL
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:0.08});
