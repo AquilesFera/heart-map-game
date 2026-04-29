@@ -281,6 +281,59 @@ footer{background:var(--bk);text-align:center;padding:80px 20px 60px;border-top:
   </div>
 </div>
 
+<!-- ============ ROOM (sala) ============ -->
+<div id="room">
+  <div class="room-card" id="roomHome">
+    <div style="font-size:42px">🏠💕</div>
+    <h2>Sala do casal</h2>
+    <p class="sub">criem ou entrem numa sala pra jogar juntinhos</p>
+    <div class="room-actions">
+      <button class="room-btn" onclick="roomCreate()">✨ Criar sala</button>
+      <button class="room-btn ghost" onclick="roomShowJoin()">🔑 Entrar com código</button>
+    </div>
+    <p class="room-err" id="roomErr"></p>
+  </div>
+  <div class="room-card" id="roomCreated" style="display:none">
+    <div style="font-size:42px">🌹</div>
+    <h2>Sala criada!</h2>
+    <p class="sub">manda esse código pro outro:</p>
+    <div class="room-code-show" id="roomCodeShow">000000</div>
+    <div class="room-actions">
+      <button class="room-btn ghost" onclick="roomCopy()">📋 Copiar código</button>
+      <button class="room-btn" onclick="roomEnter()">Entrar →</button>
+      <button class="room-btn ghost" onclick="roomBack()">← voltar</button>
+    </div>
+    <p class="room-err" id="roomErr2"></p>
+  </div>
+  <div class="room-card" id="roomJoin" style="display:none">
+    <div style="font-size:42px">🔑</div>
+    <h2>Entrar em sala</h2>
+    <p class="sub">digite o código de 6 dígitos</p>
+    <input id="roomCodeIn" class="room-input" maxlength="6" inputmode="numeric" placeholder="000000">
+    <div class="room-actions" style="margin-top:14px">
+      <button class="room-btn" onclick="roomJoinGo()">Entrar →</button>
+      <button class="room-btn ghost" onclick="roomBack()">← voltar</button>
+    </div>
+    <p class="room-err" id="roomErr3"></p>
+  </div>
+</div>
+
+<!-- ============ LOJA (modal) ============ -->
+<div id="shop">
+  <div class="shop-card">
+    <h2>🛒 Loja</h2>
+    <p style="text-align:center;color:var(--pink);font-style:italic;font-size:12px;margin-top:4px" id="shopBalance">—</p>
+    <div class="shop-tabs">
+      <button id="shopTabA" class="on" onclick="shopTab('a')">🎁 Pra Giovana</button>
+      <button id="shopTabG" onclick="shopTab('g')">✨ Itens da Giovana</button>
+    </div>
+    <div id="shopBody"></div>
+    <button class="shop-close" onclick="shopClose()">fechar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <div id="pw"></div>
 <nav>
   <ul>
